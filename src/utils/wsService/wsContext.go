@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	servepoint "github.com/AuruTus/Ergo/src/servePoint"
+	"github.com/AuruTus/Ergo/src/tools"
 	ws "github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
-type WsContext struct {
+type WsClientContext struct {
 	context.Context
 	Cancel context.CancelFunc
 
@@ -19,13 +19,13 @@ type WsContext struct {
 	conn   *ws.Conn
 }
 
-func NewWsContext(config WsClientConfig) (*WsContext, error) {
-	ctx := new(WsContext)
+func NewWsClientContext(config WsClientConfig) (*WsClientContext, error) {
+	ctx := new(WsClientContext)
 
 	/* init context and connection */
 	ctx.Context, ctx.Cancel = context.WithCancel(context.Background())
-	ctx.dialer = &ws.Dialer{}
 
+	ctx.dialer = ws.DefaultDialer
 	conn, resp, err := ctx.dialer.DialContext(
 		ctx,
 		config.HostAddr.Network(),
@@ -33,7 +33,7 @@ func NewWsContext(config WsClientConfig) (*WsContext, error) {
 	)
 	ctx.conn = conn
 	if err != nil {
-		servepoint.GlobalLogger.WithFields(
+		tools.Log.WithFields(
 			map[string]any{
 				"response": resp,
 				"wsconfig": config,
@@ -42,6 +42,7 @@ func NewWsContext(config WsClientConfig) (*WsContext, error) {
 		return nil, fmt.Errorf("faild websocket handshake: %w", err)
 	}
 
+	// TODO using tools to wrap it
 	ctx.Logger = logrus.New()
 
 	return ctx, nil
