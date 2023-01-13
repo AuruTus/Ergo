@@ -76,26 +76,23 @@ func NewConfiguredLogger(configs LogConfigs) (logger *logrus.Logger) {
 	loggerRef := reflect.ValueOf(logger).Elem()
 
 	for fieldName, config := range configs {
-		/*
-			NOTE: unicode package will treat excluding letters as Lower or Upper Letters.
-			To avoid these undesired rule check, we need define our own ASCII identifier name
-			checker
-		*/
-		if !isLogConfigKeyValid(fieldName) {
+		// if there's invalid config in arguments, neglect it and continue.
+		field := loggerRef.FieldByName(fieldName)
+
+		// Check if the field gotten by config key is valid
+		if !field.IsValid() || !field.CanSet() {
 			Log.WithFields(logrus.Fields{"fieldName": fieldName}).
-				Warnf("Invalid config fieldName\n")
+				Warnf("Invalid config entry name\n")
 			continue
 		}
 
 		configType := reflect.TypeOf(config)
 		configVal := reflect.ValueOf(config)
 
-		field := loggerRef.FieldByName(fieldName)
-		// if there's invalid config in arguments, neglect it and continue.
-		if !field.IsValid() || !field.CanSet() || (!field.CanConvert(configType) && !configType.ConvertibleTo(field.Type())) {
-			// the field.Type() equals to the type in the struct definition. It maybe an interface.
+		// Check if the config value can be set to the field
+		if !field.CanConvert(configType) && !configType.ConvertibleTo(field.Type()) {
 			Log.WithFields(logrus.Fields{"fieldName": fieldName, "configType": configType}).
-				Warnf("Invalid log config entry\n")
+				Warnf("Invalid log config entry value\n")
 			continue
 		}
 
