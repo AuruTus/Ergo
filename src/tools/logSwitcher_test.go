@@ -4,21 +4,9 @@ import (
 	"os"
 	"reflect"
 	"testing"
-	"unsafe"
 
 	"github.com/sirupsen/logrus"
 )
-
-func TestStringHeader(t *testing.T) {
-	str := "Hello, 世界"
-	hdr := (*reflect.StringHeader)(unsafe.Pointer(&str))
-	t.Logf("str pointer:%d %d\n", hdr.Data, hdr.Len)
-	strSliced := str[:1]
-	hdr = (*reflect.StringHeader)(unsafe.Pointer(&strSliced))
-	t.Logf("str pointer:%d %d\n", hdr.Data, hdr.Len)
-
-	t.Fail()
-}
 
 func TestReflectCompare(t *testing.T) {
 	type TestReflectCompareArg struct {
