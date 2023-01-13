@@ -22,7 +22,7 @@ type WsClientContext struct {
 func NewWsClientContext(config WsClientConfig) (*WsClientContext, error) {
 	ctx := new(WsClientContext)
 
-	/* init context and connection */
+	// init context and connection
 	ctx.Context, ctx.Cancel = context.WithCancel(context.Background())
 
 	ctx.dialer = ws.DefaultDialer
@@ -31,7 +31,6 @@ func NewWsClientContext(config WsClientConfig) (*WsClientContext, error) {
 		config.HostAddr.Network(),
 		config.RequestHeader,
 	)
-	ctx.conn = conn
 	if err != nil {
 		tools.Log.WithFields(
 			map[string]any{
@@ -41,9 +40,9 @@ func NewWsClientContext(config WsClientConfig) (*WsClientContext, error) {
 		).Errorf("websocket connection to %s failed\n", config.HostAddr.Network())
 		return nil, fmt.Errorf("faild websocket handshake: %w", err)
 	}
+	ctx.conn = conn
 
-	// TODO using tools to wrap it
-	ctx.Logger = logrus.New()
+	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
 
 	return ctx, nil
 }
