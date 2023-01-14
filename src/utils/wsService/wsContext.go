@@ -19,6 +19,7 @@ type WsClientContext struct {
 	conn   *ws.Conn
 }
 
+/* NewWsClientContext will try to create context with relevant websocket connection */
 func NewWsClientContext(config WsClientConfig) (*WsClientContext, error) {
 	ctx := new(WsClientContext)
 

@@ -13,3 +13,12 @@ type WsClientConfig struct {
 
 	LogConfigs tools.LogConfigs
 }
+
+// TODO: read config from file
+func (c *WsClientConfig) initRequestHeader() error {
+	header := make(http.Header)
+	// TODO set token for `Authorization` field
+	header.Add("Authorization", "1234")
+	header.Add("Content-Type", "application/json; charset=utf-8")
+	return nil
+}
