@@ -5,5 +5,5 @@ package servepoint
 	It's implemented as the client or the server depending on protocals and scinarios;
 */
 type ServerPoint interface {
-	Serve()
+	Serve() error
 }
