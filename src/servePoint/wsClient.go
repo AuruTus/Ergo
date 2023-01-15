@@ -19,16 +19,12 @@ type WsClient struct {
 
 var _ ServerPoint = (*WsClient)(nil)
 
-func (s *WsClient) Serve() (err error) {
+func (s *WsClient) Register() (err error) {
 	s.initWsClient()
+	return
+}
 
-	s.ctx, err = wsservice.NewWsClientContext(s.WSConfig)
-	if err != nil {
-		tools.Log.WithFields(logrus.Fields{"config": *s.WSConfig}).
-			Errorf("error when init websocket context\n")
-		return fmt.Errorf("webscoket context init failed: %w", err)
-	}
-
+func (s *WsClient) Serve() (err error) {
 	// retry at most 3 times
 	for i := range [3]struct{}{} {
 		tools.Log.Infof("try to connect the websocket server the %d time\n", i)
@@ -50,9 +46,18 @@ func (s *WsClient) Serve() (err error) {
 	return
 }
 
-func (s *WsClient) initWsClient() {
-	// TODO
+func (s *WsClient) initWsClient() (err error) {
+	// TODO load configuration from config file
 	s.WSConfig = nil
+
+	s.ctx, err = wsservice.NewWsClientContext(s.WSConfig)
+	if err != nil {
+		tools.Log.WithFields(logrus.Fields{"config": *s.WSConfig}).
+			Errorf("error when init websocket context\n")
+		return fmt.Errorf("webscoket context init failed: %w", err)
+	}
+
+	return
 }
 
 func NewWsClient() *WsClient {
