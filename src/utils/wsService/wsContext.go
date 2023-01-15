@@ -20,13 +20,20 @@ type WsClientContext struct {
 }
 
 /* NewWsClientContext will try to create context with relevant websocket connection */
-func NewWsClientContext(config WsClientConfig) (*WsClientContext, error) {
+func NewWsClientContext(config *WsClientConfig) (*WsClientContext, error) {
 	ctx := new(WsClientContext)
 
 	// init context and connection
 	ctx.Context, ctx.Cancel = context.WithCancel(context.Background())
 
 	ctx.dialer = ws.DefaultDialer
+
+	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
+
+	return ctx, nil
+}
+
+func (ctx *WsClientContext) TryConnect(config *WsClientConfig) error {
 	conn, resp, err := ctx.dialer.DialContext(
 		ctx,
 		config.HostAddr.Network(),
@@ -39,11 +46,12 @@ func NewWsClientContext(config WsClientConfig) (*WsClientContext, error) {
 				"wsconfig": config,
 			},
 		).Errorf("websocket connection to %s failed\n", config.HostAddr.Network())
-		return nil, fmt.Errorf("faild websocket handshake: %w", err)
+		return fmt.Errorf("faild websocket handshake: %w", err)
 	}
 	ctx.conn = conn
+	return nil
+}
 
-	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
+func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Context, any, any)) {
 
-	return ctx, nil
 }
