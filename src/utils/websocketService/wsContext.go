@@ -36,7 +36,7 @@ func NewWsClientContext(config *WsClientConfig) (*WsClientContext, error) {
 func (ctx *WsClientContext) TryConnect(config *WsClientConfig) error {
 	conn, resp, err := ctx.dialer.DialContext(
 		ctx,
-		config.HostAddr.Network(),
+		config.HostAddr.String(),
 		config.RequestHeader,
 	)
 	if err != nil {
@@ -45,7 +45,7 @@ func (ctx *WsClientContext) TryConnect(config *WsClientConfig) error {
 				"response": resp,
 				"wsconfig": config,
 			},
-		).Errorf("websocket connection to %s failed\n", config.HostAddr.Network())
+		).Errorf("websocket connection to %s failed\n", config.HostAddr.String())
 		return fmt.Errorf("faild websocket handshake: %w", err)
 	}
 	ctx.Conn = conn

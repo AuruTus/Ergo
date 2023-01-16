@@ -28,10 +28,10 @@ func (s *WsClient) Register() (err error) {
 func (s *WsClient) Serve() (err error) {
 	// retry at most 3 times
 	for i := range [3]struct{}{} {
-		tools.Log.Infof("try to connect the websocket server the %d time\n", i)
+		tools.Log.Infof("try to connect the websocket server the %d time\n", i+1)
 		if err = s.ctx.TryConnect(s.WSConfig); err != nil {
 			time.Sleep(1 * time.Second)
-			tools.Log.WithFields(logrus.Fields{"error": err}).Warnf("try websocket connection failed\n")
+			tools.Log.WithFields(logrus.Fields{"error": err}).Warnf("try websocket connection failed")
 			continue
 		}
 		// succeed to connect with the ws server
@@ -49,7 +49,9 @@ func (s *WsClient) Serve() (err error) {
 
 func (s *WsClient) initWsClient() (err error) {
 	// TODO load configuration from config file
-	s.WSConfig = nil
+	if s.WSConfig, err = wsservice.NewWSClientConfig(); err != nil {
+		return fmt.Errorf("new ws client failed to init config: %w", err)
+	}
 
 	s.ctx, err = wsservice.NewWsClientContext(s.WSConfig)
 	if err != nil {
@@ -63,8 +65,8 @@ func (s *WsClient) initWsClient() (err error) {
 
 func NewWsClient() (s *WsClient, err error) {
 	s = &WsClient{}
-	if s.WSConfig, err = wsservice.NewWSClientConfig(); err != nil {
-		return nil, fmt.Errorf("new ws client failed to init config: %w", err)
+	if err = s.initWsClient(); err != nil {
+		return nil, fmt.Errorf("failed to init ws client: %w", err)
 	}
 	return
 }
