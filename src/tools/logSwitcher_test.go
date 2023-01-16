@@ -92,6 +92,8 @@ func TestNewConfiguredLogger(t *testing.T) {
 			"ExitFunc":     123,
 			"ReportCaller": false,
 		}, reflectCompare, true},
+
+		{nil, reflectCompare, true},
 	}
 
 	/* assertion code */

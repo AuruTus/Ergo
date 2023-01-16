@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/AuruTus/Ergo/src/tools"
-	wsservice "github.com/AuruTus/Ergo/src/utils/wsService"
+	wsservice "github.com/AuruTus/Ergo/src/utils/websocketService"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,6 +19,7 @@ type WsClient struct {
 
 var _ ServerPoint = (*WsClient)(nil)
 
+/* TODO: add service register logic */
 func (s *WsClient) Register() (err error) {
 	s.initWsClient()
 	return
@@ -60,6 +61,10 @@ func (s *WsClient) initWsClient() (err error) {
 	return
 }
 
-func NewWsClient() *WsClient {
-	return &WsClient{}
+func NewWsClient() (s *WsClient, err error) {
+	s = &WsClient{}
+	if s.WSConfig, err = wsservice.NewWSClientConfig(); err != nil {
+		return nil, fmt.Errorf("new ws client failed to init config: %w", err)
+	}
+	return
 }

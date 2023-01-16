@@ -1,4 +1,4 @@
-package wsservice
+package websocketService
 
 import (
 	"context"
@@ -26,11 +26,8 @@ type WsClientContext struct {
 func NewWsClientContext(config *WsClientConfig) (*WsClientContext, error) {
 	ctx := new(WsClientContext)
 
-	// init context and connection
 	ctx.Context, ctx.Cancel = context.WithCancel(context.Background())
-
 	ctx.dialer = ws.DefaultDialer
-
 	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
 
 	return ctx, nil
@@ -61,9 +58,9 @@ func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Cont
 	heartBeatTicker := time.NewTicker(ctx.heartBeatInterval)
 	defer heartBeatTicker.Stop()
 
-	// todo
-	receiveHandler := func() {
+	go func() {
 		for {
+			// TODO add support for converting []byte to json
 			_, msg, err := ctx.Conn.ReadMessage()
 			if err != nil {
 				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
@@ -71,14 +68,13 @@ func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Cont
 			}
 			ctx.Logger.Infof("msg: %s\n", msg)
 		}
-	}
-	go receiveHandler()
+	}()
 
 	for {
 		select {
 		// todo read cqhttp api
 		case <-heartBeatTicker.C:
-			ctx.Conn.WriteMessage(ws.TextMessage, []byte("Aloha"))
+			// ctx.Conn.WriteMessage(ws.TextMessage, []byte("Aloha"))
 		case <-ctx.Done():
 			handlers[0](ctx, struct{}{}, struct{}{})
 		}
