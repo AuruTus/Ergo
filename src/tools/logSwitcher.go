@@ -3,6 +3,7 @@ package tools
 import (
 	"os"
 	"reflect"
+	"sync"
 	"unicode"
 
 	"github.com/sirupsen/logrus"
@@ -13,11 +14,14 @@ func initLog() {
 	if Log != nil {
 		return
 	}
-	Log = logSwitcher()
+	initLogOnce.Do(func() { Log = logSwitcher() })
 }
 
 /* Log is the global Log instance */
-var Log *logrus.Logger
+var (
+	Log         *logrus.Logger
+	initLogOnce sync.Once
+)
 
 func logSwitcher() *logrus.Logger {
 	switch EnviromentSettings.ServiceLevel {
