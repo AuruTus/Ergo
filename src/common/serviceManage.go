@@ -22,11 +22,19 @@ func RunServices() {
 	tools.Log.Infof("Good day! Ergo is at your service.\n")
 
 	// TODO add entrance from service manager
+	done := make(chan struct{}, 1)
+
 	s, _ := sp.NewWsClient()
-	s.Serve()
+	sCancel, _ := s.Register()
+	if err := s.Serve(); err != nil {
+		tools.Log.Errorf("%v\n", err)
+		done <- struct{}{}
+	}
 
 	select {
 	case <-os_signal:
+		sCancel()
 	case <-ServePointDone():
+	case <-done:
 	}
 }

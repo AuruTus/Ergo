@@ -2,7 +2,7 @@ package websocketService
 
 import (
 	"context"
-	"fmt"
+	"sync"
 	"time"
 
 	"github.com/AuruTus/Ergo/src/tools"
@@ -16,8 +16,9 @@ type WsClientContext struct {
 
 	Logger *logrus.Logger
 
-	dialer *ws.Dialer
-	Conn   *ws.Conn
+	dialer         *ws.Dialer
+	Conn           *ws.Conn
+	cancelConnOnce sync.Once
 
 	heartBeatInterval time.Duration
 }
@@ -27,56 +28,16 @@ func NewWsClientContext(config *WsClientConfig) (*WsClientContext, error) {
 	ctx := new(WsClientContext)
 
 	ctx.Context, ctx.Cancel = context.WithCancel(context.Background())
+	ctx.Cancel = func() {
+		if ctx.Conn != nil {
+			ctx.cancelConnOnce.Do(func() { ctx.Conn.Close() })
+		}
+		ctx.Cancel()
+	}
 	ctx.dialer = ws.DefaultDialer
 	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
 
+	ctx.heartBeatInterval = 1 * time.Second
+
 	return ctx, nil
-}
-
-func (ctx *WsClientContext) TryConnect(config *WsClientConfig) error {
-	conn, resp, err := ctx.dialer.DialContext(
-		ctx,
-		config.HostAddr.String(),
-		config.RequestHeader,
-	)
-	if err != nil {
-		tools.Log.WithFields(
-			map[string]any{
-				"response": resp,
-				"wsconfig": config,
-			},
-		).Errorf("websocket connection to %s failed\n", config.HostAddr.String())
-		return fmt.Errorf("faild websocket handshake: %w", err)
-	}
-	ctx.Conn = conn
-	return nil
-}
-
-func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Context, any, any)) {
-	defer ctx.Conn.Close()
-
-	heartBeatTicker := time.NewTicker(ctx.heartBeatInterval)
-	defer heartBeatTicker.Stop()
-
-	go func() {
-		for {
-			// TODO add support for converting []byte to json
-			_, msg, err := ctx.Conn.ReadMessage()
-			if err != nil {
-				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
-				return
-			}
-			ctx.Logger.Infof("msg: %s\n", msg)
-		}
-	}()
-
-	for {
-		select {
-		// todo read cqhttp api
-		case <-heartBeatTicker.C:
-			// ctx.Conn.WriteMessage(ws.TextMessage, []byte("Aloha"))
-		case <-ctx.Done():
-			handlers[0](ctx, struct{}{}, struct{}{})
-		}
-	}
 }

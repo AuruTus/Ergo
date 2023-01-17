@@ -17,7 +17,7 @@ type WsClientConfig struct {
 
 // todo: read addr from config
 func (c *WsClientConfig) initHostAddr() (err error) {
-	c.HostAddr, err = ResolveWSAddrFromSocket("0.0.0.0:8080", "/")
+	c.HostAddr, err = ResolveWSAddrFromSocket("127.0.0.1:8080", "/")
 	return
 }
 
@@ -40,13 +40,13 @@ func NewWSClientConfig() (c *WsClientConfig, err error) {
 	c = &WsClientConfig{}
 
 	if err = c.initHostAddr(); err != nil {
-		return nil, fmt.Errorf("initHostAddr failed: %w", err)
+		return nil, fmt.Errorf("initHostAddr: %w", err)
 	}
 	if err = c.initRequestHeader(); err != nil {
-		return nil, fmt.Errorf("initRequestHeader failed: %w", err)
+		return nil, fmt.Errorf("initRequestHeader: %w", err)
 	}
 	if err = c.initLogConfig(); err != nil {
-		return nil, fmt.Errorf("initLogConfig failed: %w", err)
+		return nil, fmt.Errorf("initLogConfig: %w", err)
 	}
 
 	return
