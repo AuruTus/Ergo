@@ -5,8 +5,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	sp "github.com/AuruTus/Ergo/src/servePoint"
-	"github.com/AuruTus/Ergo/src/tools"
+	sp "github.com/AuruTus/Ergo/pkg/servePoint"
+	"github.com/AuruTus/Ergo/tools"
 )
 
 // TODO complete servePointer register
@@ -25,7 +25,7 @@ func RunServices() {
 	done := make(chan struct{}, 1)
 
 	s, _ := sp.NewWsClient()
-	sCancel, _ := s.Register()
+	s.Register()
 	if err := s.Serve(); err != nil {
 		tools.Log.Errorf("%v\n", err)
 		done <- struct{}{}
@@ -33,7 +33,7 @@ func RunServices() {
 
 	select {
 	case <-os_signal:
-		sCancel()
+		s.Close()
 	case <-ServePointDone():
 	case <-done:
 	}

@@ -5,7 +5,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/AuruTus/Ergo/src/tools"
+	"github.com/AuruTus/Ergo/tools"
 )
 
 type WsClientConfig struct {

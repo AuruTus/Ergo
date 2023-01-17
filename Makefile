@@ -11,12 +11,12 @@
 
 # build: init-config
 build:
-	go build -o ./bin/test/ergo .
+	go build -o ./bin/ergo ./cmd/ergo
 
 
 .PHONY: run
 run: build
-	./bin/test/ergo
+	./bin/ergo
 
 
 .PHONY: test

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/AuruTus/Ergo/src/tools"
+	"github.com/AuruTus/Ergo/tools"
 	"github.com/sirupsen/logrus"
 )
 
@@ -63,26 +63,28 @@ func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 }
 
 func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Context, any, any)) {
+	// goroutine for send request
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
-			default:
-				// TODO add support for converting []byte to json
-				_, msg, err := ctx.Conn.ReadMessage()
-				if err != nil {
-					ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
-					return
-				}
-				ctx.Logger.Infof("msg: %s\n", msg)
+				// todo read cqhttp api
 			}
 		}
 	}()
 
+	// awaiting
 	for {
 		select {
 		case <-ctx.Done():
-			// todo read cqhttp api
+		default:
+			// TODO add support for converting []byte to json
+			_, msg, err := ctx.Conn.ReadMessage()
+			if err != nil {
+				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
+				return
+			}
+			ctx.Logger.Infof("msg: %s\n", msg)
 		}
 	}
 }

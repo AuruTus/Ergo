@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/AuruTus/Ergo/src/tools"
+	"github.com/AuruTus/Ergo/tools"
 	"github.com/google/uuid"
 	ws "github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"

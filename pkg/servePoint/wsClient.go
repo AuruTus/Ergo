@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/AuruTus/Ergo/src/tools"
-	wsservice "github.com/AuruTus/Ergo/src/utils/websocketService"
+	wsservice "github.com/AuruTus/Ergo/pkg/utils/websocketService"
+	"github.com/AuruTus/Ergo/tools"
 	"github.com/sirupsen/logrus"
 )
 
