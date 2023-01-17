@@ -17,12 +17,11 @@ type WsClient struct {
 	Handlers []func(context.Context, any, any)
 }
 
-var _ ServerPoint = (*WsClient)(nil)
+var _ ServePoint = (*WsClient)(nil)
 
 /* TODO: add service register logic */
-func (s *WsClient) Register() (cancel func(), err error) {
-	cancel = func() { s.ctx.Cancel() }
-	return
+func (s *WsClient) Register() (err error) {
+	return nil
 }
 
 func (s *WsClient) Serve() (err error) {
@@ -45,6 +44,13 @@ func (s *WsClient) Serve() (err error) {
 	wsservice.ServeWSClientConnection(s.ctx, s.Handlers...)
 
 	return
+}
+
+/* TODO: add close function details */
+func (s *WsClient) Close() error {
+	s.ctx.Cancel()
+
+	return nil
 }
 
 func (s *WsClient) initWsClient() (err error) {
