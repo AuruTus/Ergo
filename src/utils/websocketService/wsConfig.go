@@ -33,6 +33,7 @@ func (c *WsClientConfig) initRequestHeader() error {
 
 // todo read log config from config
 func (c *WsClientConfig) initLogConfig() error {
+	c.LogConfigs = make(map[string]any)
 	return nil
 }
 
