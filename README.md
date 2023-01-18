@@ -12,5 +12,6 @@ A framework that aims to integrate kinds of chatbots with customizable interface
  - [ ] Complete the websocket client implements for cqHttp
  - [ ] Support robot processing monitoring (and observability in the future)
  - [ ] Add a global server register and a service entrance.
- - [ ] Add Makefile
- - [ ] Add README and example
+ - [x] Add Makefile
+ - [x] Add README
+ - [ ] Add example/
