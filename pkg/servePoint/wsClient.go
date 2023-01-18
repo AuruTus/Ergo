@@ -19,11 +19,6 @@ type WsClient struct {
 
 var _ ServePoint = (*WsClient)(nil)
 
-/* TODO: add service register logic */
-func (s *WsClient) Register() (err error) {
-	return nil
-}
-
 func (s *WsClient) Serve() (err error) {
 	// retry at most 3 times
 	for i := range [3]struct{}{} {
@@ -69,10 +64,12 @@ func (s *WsClient) initWsClient() (err error) {
 	return
 }
 
-func NewWsClient() (s *WsClient, err error) {
-	s = &WsClient{}
-	if err = s.initWsClient(); err != nil {
+func NewWsClient() (ServePoint, error) {
+	s := &WsClient{}
+	if err := s.initWsClient(); err != nil {
 		return nil, fmt.Errorf("init ws client: %w", err)
 	}
-	return
+	return s, nil
 }
+
+var _ ServerPointGenerator = NewWsClient
