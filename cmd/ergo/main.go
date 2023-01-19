@@ -19,12 +19,7 @@ func RunServices() {
 	// TODO add entrance from service manager
 	done := make(chan struct{}, 1)
 
-	// s, _ := sp.NewWsClient()
-	// if err := s.Serve(); err != nil {
-	// 	tools.Log.Errorf("%v\n", err)
-	// 	done <- struct{}{}
-	// }
-	registerServices()
+	services.RegisterServicesAll(registerList)
 	services.StartServicesAll()
 
 	select {

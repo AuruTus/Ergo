@@ -6,6 +6,7 @@ import (
 
 	sp "github.com/AuruTus/Ergo/pkg/servePoint"
 	"github.com/AuruTus/Ergo/tools"
+	"github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -78,6 +79,14 @@ func RegisterNamedService(name string, g sp.ServerPointGenerator, desc string) f
 			return err
 		}
 		return nil
+	}
+}
+
+func RegisterServicesAll(registerList [](func() error)) {
+	for i, f := range registerList {
+		if err := f(); err != nil {
+			tools.Log.WithFields(logrus.Fields{"error": err}).Errorf("start service %v failed\n", i)
+		}
 	}
 }
 
