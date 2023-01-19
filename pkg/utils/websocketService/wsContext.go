@@ -19,7 +19,7 @@ type WsClientContext struct {
 	*/
 	// embeded context
 	context.Context
-	Cancel context.CancelFunc
+	cancel context.CancelFunc
 	// websocket connection flieds
 	dialer        *ws.Dialer
 	Conn          *ws.Conn
@@ -27,6 +27,19 @@ type WsClientContext struct {
 
 	// context level logger
 	Logger *logrus.Logger
+
+	writerBufferSize int
+}
+
+func (ctx *WsClientContext) Cancel() {
+	if ctx.Conn != nil {
+		ctx.closeConnOnce.Do(func() {
+			TrySendCloseClosure(ctx)
+		})
+	}
+	if ctx.cancel != nil {
+		ctx.cancel()
+	}
 }
 
 /* NewWsClientContext will try to create context with relevant websocket connection */
@@ -35,16 +48,14 @@ func NewWsClientContext(config *WsClientConfig) (*WsClientContext, error) {
 
 	ctx.CID = uuid.New().String()
 
-	_ctx, cancel := context.WithCancel(context.Background())
-	ctx.Context = _ctx
-	ctx.Cancel = func() {
-		if ctx.Conn != nil {
-			ctx.closeConnOnce.Do(func() { ctx.Conn.Close() })
-		}
-		cancel()
-	}
+	ctx.Context, ctx.cancel = context.WithCancel(context.Background())
 	ctx.dialer = ws.DefaultDialer
 	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
+
+	ctx.writerBufferSize = DEFAULT_WRITER_BUFFER_SIZE
+	if config.WriterBufferSize > 0 {
+		ctx.writerBufferSize = config.WriterBufferSize
+	}
 
 	return ctx, nil
 }

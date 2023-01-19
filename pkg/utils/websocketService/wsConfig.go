@@ -13,6 +13,8 @@ type WsClientConfig struct {
 	RequestHeader http.Header
 
 	LogConfigs tools.LogConfigs
+
+	WriterBufferSize int
 }
 
 // todo: read addr from config

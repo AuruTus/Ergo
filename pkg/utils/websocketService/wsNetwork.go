@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/AuruTus/Ergo/tools"
+	ws "github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,6 +40,13 @@ func ResolveWSAddrFromSocket(socket, api string) (addr *WSAddr, err error) {
 /*
 	WS Connection
 */
+
+const (
+	DEFAULT_WRITER_BUFFER_SIZE = 10
+
+	DEFAULT_RETRY_TIME = 3
+)
+
 func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 	if ctx.Conn != nil {
 		return fmt.Errorf("connection for context %s is already established", ctx.CID)
@@ -63,28 +71,50 @@ func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 }
 
 func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Context, any, any)) {
-	// goroutine for send request
+	// sync between reader and writer
+	info := make(chan interface{}, ctx.writerBufferSize)
+	wDone := make(chan struct{})
+
+	defer ctx.Conn.Close()
+	defer func() { <-wDone }()
+
+	// writer goroutine
 	go func() {
+		// ensure the last writer is closed
+		defer func() { wDone <- struct{}{} }()
+
 		for {
 			select {
+			// todo read cqhttp api
+			case i := <-info:
+				ctx.Logger.Infof("writer get info %v\n", i)
 			case <-ctx.Done():
-				// todo read cqhttp api
 			}
 		}
 	}()
 
-	// awaiting
+	// reader main goroutine
 	for {
 		select {
 		case <-ctx.Done():
+			return
 		default:
-			// TODO add support for converting []byte to json
 			_, msg, err := ctx.Conn.ReadMessage()
-			if err != nil {
+			switch {
+			case err != nil:
 				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
-				return
+				err = nil
+			default:
+				ctx.Logger.Infof("msg: %s\n", msg)
+				info <- msg
 			}
-			ctx.Logger.Infof("msg: %s\n", msg)
 		}
 	}
+}
+
+func TrySendCloseClosure(ctx *WsClientContext) error {
+	return ctx.Conn.WriteMessage(
+		ws.CloseMessage,
+		ws.FormatCloseMessage(ws.CloseNormalClosure, ""),
+	)
 }
