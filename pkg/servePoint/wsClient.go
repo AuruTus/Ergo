@@ -22,7 +22,7 @@ var _ ServePoint = (*WsClient)(nil)
 func (s *WsClient) Serve() (err error) {
 	// retry at most 3 times
 	for i := range [3]struct{}{} {
-		tools.Log.Infof("try to connect the websocket server the %d time\n", i+1)
+		tools.Log.Infof("try to connect with the address %s the %d time\n", s.WSConfig.HostAddr.String(), i+1)
 		if err = wsservice.TryConnect(s.ctx, s.WSConfig); err != nil {
 			time.Sleep(1 * time.Second)
 			tools.Log.Warnf("client failed to create websocket connection")
@@ -45,11 +45,27 @@ func (s *WsClient) IsAlive() bool {
 	return s != nil && s.ctx.IsActive()
 }
 
-/* TODO: add close function details */
-func (s *WsClient) Close() error {
+func (s *WsClient) Close() (err error) {
+	if !s.IsAlive() {
+		return fmt.Errorf("dead service")
+	}
+	// Just send close handshake control message
+	// The close of ws connection will be really completed in the reader main goroutine
+	for i := range [3]struct{}{} {
+		tools.Log.Infof("say goodbye with the websocket server the %d time\n", i+1)
+		if err = wsservice.TrySendCloseClosure(s.ctx); err != nil {
+			time.Sleep(1 * time.Second)
+			tools.Log.Warnf("client failed to send close closure")
+			continue
+		}
+		break
+	}
+	if err != nil {
+		tools.Log.WithFields(logrus.Fields{"error": err}).Errorf("failed to send close closure\n")
+		err = fmt.Errorf("send close closure: %w", err)
+	}
 	s.ctx.Cancel()
-
-	return nil
+	return
 }
 
 func (s *WsClient) initWsClient(configKey string) (err error) {

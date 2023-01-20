@@ -20,10 +20,10 @@ type WsClientContext struct {
 	*/
 	// embeded context
 	context.Context
-	cancel context.CancelFunc
+	Cancel context.CancelFunc
 	// websocket connection flieds
 	dialer        *ws.Dialer
-	Conn          *ws.Conn
+	conn          *ws.Conn
 	closeConnOnce sync.Once
 	// used as atomic
 	active uint32
@@ -34,17 +34,25 @@ type WsClientContext struct {
 	writerBufferSize int
 }
 
-func (ctx *WsClientContext) Cancel() {
-	if ctx.Conn != nil {
-		// Just send close handshake control message
-		// The close of ws connection will be really completed in the reader main goroutine
-		ctx.closeConnOnce.Do(func() {
-			TrySendCloseClosure(ctx)
-		})
+func (ctx *WsClientContext) closeConn() {
+	if !ctx.IsActive() {
+		return
 	}
-	if ctx.cancel != nil {
-		ctx.cancel()
+	ctx.closeConnOnce.Do(func() { ctx.conn.Close() })
+}
+
+func (ctx *WsClientContext) deactivate() {
+	if ctx != nil {
+		return
 	}
+	atomic.StoreUint32(&ctx.active, 0)
+}
+
+func (ctx *WsClientContext) activate() {
+	if ctx == nil {
+		return
+	}
+	atomic.StoreUint32(&ctx.active, 1)
 }
 
 func (ctx *WsClientContext) IsActive() bool {
@@ -57,7 +65,7 @@ func NewWsClientContext(config *WsClientConfig) (*WsClientContext, error) {
 
 	ctx.CID = uuid.New().String()
 
-	ctx.Context, ctx.cancel = context.WithCancel(context.Background())
+	ctx.Context, ctx.Cancel = context.WithCancel(context.Background())
 	ctx.dialer = ws.DefaultDialer
 	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
 

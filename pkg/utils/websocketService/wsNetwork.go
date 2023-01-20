@@ -3,7 +3,6 @@ package websocketService
 import (
 	"fmt"
 	"net"
-	"sync/atomic"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
 	"github.com/AuruTus/Ergo/tools"
@@ -49,7 +48,7 @@ const (
 )
 
 func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
-	if ctx.Conn != nil {
+	if ctx.conn != nil {
 		return fmt.Errorf("connection for context %s is already established", ctx.CID)
 	}
 	conn, resp, err := ctx.dialer.DialContext(
@@ -58,17 +57,17 @@ func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 		config.RequestHeader,
 	)
 	if err != nil {
-		tools.Log.WithFields(
+		ctx.Logger.WithFields(
 			map[string]any{
 				"response":      resp,
 				"requestHeader": config.RequestHeader,
 			},
-		).Errorf("failed to dial the websocket server %s\n", config.HostAddr.String())
+		).Errorf("failed to dial the address %s\n", config.HostAddr.String())
 		return fmt.Errorf("dial websocket server: %w", err)
 	}
-	ctx.Conn = conn
-	atomic.StoreUint32(&ctx.active, 1)
-	tools.Log.Infof("succeed connecting to ws server end %s")
+	ctx.conn = conn
+	ctx.activate()
+	ctx.Logger.Infof("succeed connecting to websocket serverend %s\n", ctx.conn.RemoteAddr().String())
 
 	return nil
 }
@@ -81,8 +80,10 @@ func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
 	defer func() {
 		close(info)
 		<-wDone
-		ctx.Conn.Close()
-		atomic.StoreUint32(&ctx.active, 0)
+		ctx.closeConn()
+		ctx.deactivate()
+		ctx.Logger.Infof("connection with host %s closed\n", ctx.conn.RemoteAddr().String())
+		ctx.Logger.Infof("context %s is deactive, ws client is down", ctx.CID)
 	}()
 
 	// writer goroutine
@@ -108,7 +109,7 @@ func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
 		case <-ctx.Done():
 			return
 		default:
-			_, msg, err := ctx.Conn.ReadMessage()
+			_, msg, err := ctx.conn.ReadMessage()
 			switch {
 			case err != nil:
 				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
@@ -121,7 +122,7 @@ func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
 }
 
 func TrySendCloseClosure(ctx *WsClientContext) error {
-	return ctx.Conn.WriteMessage(
+	return ctx.conn.WriteMessage(
 		ws.CloseMessage,
 		ws.FormatCloseMessage(ws.CloseNormalClosure, ""),
 	)
