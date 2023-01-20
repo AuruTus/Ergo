@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sync/atomic"
 
 	"github.com/AuruTus/Ergo/tools"
 	ws "github.com/gorilla/websocket"
@@ -66,6 +67,7 @@ func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 		return fmt.Errorf("dial websocket server: %w", err)
 	}
 	ctx.Conn = conn
+	atomic.StoreUint32(&ctx.active, 1)
 
 	return nil
 }
@@ -75,20 +77,23 @@ func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Cont
 	info := make(chan interface{}, ctx.writerBufferSize)
 	wDone := make(chan struct{})
 
-	defer ctx.Conn.Close()
-	defer func() { <-wDone }()
+	defer func() {
+		<-wDone
+		ctx.Conn.Close()
+		atomic.StoreUint32(&ctx.active, 0)
+	}()
 
 	// writer goroutine
 	go func() {
-		// ensure the last writer is closed
+		// ensure the last ws writer is closed
 		defer func() { wDone <- struct{}{} }()
 
-		for {
+		for i := range info {
 			select {
-			// todo read cqhttp api
-			case i := <-info:
-				ctx.Logger.Infof("writer get info %v\n", i)
 			case <-ctx.Done():
+				return
+			default:
+				ctx.Logger.Infof("writer get info %v\n", i)
 			}
 		}
 	}()
@@ -103,7 +108,6 @@ func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Cont
 			switch {
 			case err != nil:
 				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
-				err = nil
 			default:
 				ctx.Logger.Infof("msg: %s\n", msg)
 				info <- msg

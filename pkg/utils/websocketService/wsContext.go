@@ -3,6 +3,7 @@ package websocketService
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 
 	"github.com/AuruTus/Ergo/tools"
 	"github.com/google/uuid"
@@ -24,6 +25,8 @@ type WsClientContext struct {
 	dialer        *ws.Dialer
 	Conn          *ws.Conn
 	closeConnOnce sync.Once
+	// used as atomic
+	active uint32
 
 	// context level logger
 	Logger *logrus.Logger
@@ -33,6 +36,8 @@ type WsClientContext struct {
 
 func (ctx *WsClientContext) Cancel() {
 	if ctx.Conn != nil {
+		// Just send close handshake control message
+		// The close of ws connection will be really completed in the reader main goroutine
 		ctx.closeConnOnce.Do(func() {
 			TrySendCloseClosure(ctx)
 		})
@@ -40,6 +45,10 @@ func (ctx *WsClientContext) Cancel() {
 	if ctx.cancel != nil {
 		ctx.cancel()
 	}
+}
+
+func (ctx *WsClientContext) IsActive() bool {
+	return atomic.LoadUint32(&ctx.active) != 0
 }
 
 /* NewWsClientContext will try to create context with relevant websocket connection */
