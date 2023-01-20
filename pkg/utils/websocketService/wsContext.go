@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type WsClientContext struct {
+type WSClientContext struct {
 	// CID is the uuid for each wscontext
 	CID string
 
@@ -34,34 +34,34 @@ type WsClientContext struct {
 	writerBufferSize int
 }
 
-func (ctx *WsClientContext) closeConn() {
+func (ctx *WSClientContext) closeConn() {
 	if !ctx.IsActive() {
 		return
 	}
 	ctx.closeConnOnce.Do(func() { ctx.conn.Close() })
 }
 
-func (ctx *WsClientContext) deactivate() {
+func (ctx *WSClientContext) deactivate() {
 	if ctx != nil {
 		return
 	}
 	atomic.StoreUint32(&ctx.active, 0)
 }
 
-func (ctx *WsClientContext) activate() {
+func (ctx *WSClientContext) activate() {
 	if ctx == nil {
 		return
 	}
 	atomic.StoreUint32(&ctx.active, 1)
 }
 
-func (ctx *WsClientContext) IsActive() bool {
+func (ctx *WSClientContext) IsActive() bool {
 	return ctx != nil && atomic.LoadUint32(&ctx.active) != 0
 }
 
-/* NewWsClientContext will try to create context with relevant websocket connection */
-func NewWsClientContext(config *WsClientConfig) (*WsClientContext, error) {
-	ctx := new(WsClientContext)
+/* NewWSClientContext will try to create context with relevant websocket connection */
+func NewWSClientContext(config *WSClientConfig) (*WSClientContext, error) {
+	ctx := new(WSClientContext)
 
 	ctx.CID = uuid.New().String()
 

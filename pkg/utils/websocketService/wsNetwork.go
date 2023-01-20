@@ -47,7 +47,7 @@ const (
 	DEFAULT_RETRY_TIME = 3
 )
 
-func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
+func TryConnect(ctx *WSClientContext, config *WSClientConfig) error {
 	if ctx.conn != nil {
 		return fmt.Errorf("connection for context %s is already established", ctx.CID)
 	}
@@ -72,7 +72,7 @@ func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 	return nil
 }
 
-func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
+func ServeWSClientConnection(ctx *WSClientContext, handler handler.Handler) {
 	// sync between reader and writer
 	info := make(chan interface{}, ctx.writerBufferSize)
 	wDone := make(chan struct{})
@@ -121,7 +121,7 @@ func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
 	}
 }
 
-func TrySendCloseClosure(ctx *WsClientContext) error {
+func TrySendCloseClosure(ctx *WSClientContext) error {
 	return ctx.conn.WriteMessage(
 		ws.CloseMessage,
 		ws.FormatCloseMessage(ws.CloseNormalClosure, ""),

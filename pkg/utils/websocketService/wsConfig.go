@@ -8,7 +8,7 @@ import (
 	"github.com/AuruTus/Ergo/tools"
 )
 
-type WsClientConfig struct {
+type WSClientConfig struct {
 	HostAddr      net.Addr
 	RequestHeader http.Header
 
@@ -18,13 +18,13 @@ type WsClientConfig struct {
 }
 
 // todo: read addr from config
-func (c *WsClientConfig) initHostAddr() (err error) {
+func (c *WSClientConfig) initHostAddr() (err error) {
 	c.HostAddr, err = ResolveWSAddrFromSocket("127.0.0.1:8080", "/")
 	return
 }
 
 // TODO: read header field from config
-func (c *WsClientConfig) initRequestHeader() error {
+func (c *WSClientConfig) initRequestHeader() error {
 	header := make(http.Header)
 	// TODO set token for `Authorization` field
 	header.Add("Authorization", "bf7cbe09d71a1bcc373a")
@@ -34,13 +34,13 @@ func (c *WsClientConfig) initRequestHeader() error {
 }
 
 // todo read log config from config
-func (c *WsClientConfig) initLogConfig() error {
+func (c *WSClientConfig) initLogConfig() error {
 	c.LogConfigs = make(map[string]any)
 	return nil
 }
 
-func NewWSClientConfig() (c *WsClientConfig, err error) {
-	c = &WsClientConfig{}
+func NewWSClientConfig() (c *WSClientConfig, err error) {
+	c = &WSClientConfig{}
 
 	if err = c.initHostAddr(); err != nil {
 		return nil, fmt.Errorf("initHostAddr: %w", err)

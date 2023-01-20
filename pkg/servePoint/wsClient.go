@@ -10,16 +10,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type WsClient struct {
-	ctx *wsservice.WsClientContext
+type WSClient struct {
+	ctx *wsservice.WSClientContext
 	h   handler.Handler
 
-	WSConfig *wsservice.WsClientConfig
+	WSConfig *wsservice.WSClientConfig
 }
 
-var _ ServePoint = (*WsClient)(nil)
+var _ ServePoint = (*WSClient)(nil)
 
-func (s *WsClient) Serve() (err error) {
+func (s *WSClient) Serve() (err error) {
 	// retry at most 3 times
 	for i := range [3]struct{}{} {
 		tools.Log.Infof("try to connect with the address %s the %d time\n", s.WSConfig.HostAddr.String(), i+1)
@@ -41,11 +41,11 @@ func (s *WsClient) Serve() (err error) {
 	return
 }
 
-func (s *WsClient) IsAlive() bool {
+func (s *WSClient) IsAlive() bool {
 	return s != nil && s.ctx.IsActive()
 }
 
-func (s *WsClient) Close() (err error) {
+func (s *WSClient) Close() (err error) {
 	if !s.IsAlive() {
 		return fmt.Errorf("dead service")
 	}
@@ -68,13 +68,13 @@ func (s *WsClient) Close() (err error) {
 	return
 }
 
-func (s *WsClient) initWsClient(configKey string) (err error) {
+func (s *WSClient) initWSClient(configKey string) (err error) {
 	// TODO load configuration from config file
 	if s.WSConfig, err = wsservice.NewWSClientConfig(); err != nil {
 		return fmt.Errorf("new ws client config: %w", err)
 	}
 
-	s.ctx, err = wsservice.NewWsClientContext(s.WSConfig)
+	s.ctx, err = wsservice.NewWSClientContext(s.WSConfig)
 	if err != nil {
 		tools.Log.WithFields(logrus.Fields{"config": *s.WSConfig}).
 			Errorf("error when init websocket context\n")
@@ -84,13 +84,13 @@ func (s *WsClient) initWsClient(configKey string) (err error) {
 	return
 }
 
-func NewWsClient(configKey string, h handler.Handler) (ServePoint, error) {
-	s := &WsClient{}
-	if err := s.initWsClient(configKey); err != nil {
+func NewWSClient(configKey string, h handler.Handler) (ServePoint, error) {
+	s := &WSClient{}
+	if err := s.initWSClient(configKey); err != nil {
 		return nil, fmt.Errorf("init ws client: %w", err)
 	}
 	s.h = h
 	return s, nil
 }
 
-var _ ServerPointGenerator = NewWsClient
+var _ ServerPointGenerator = NewWSClient
