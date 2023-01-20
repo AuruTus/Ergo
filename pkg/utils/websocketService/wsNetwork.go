@@ -68,6 +68,7 @@ func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 	}
 	ctx.Conn = conn
 	atomic.StoreUint32(&ctx.active, 1)
+	tools.Log.Infof("succeed connecting to ws server end %s")
 
 	return nil
 }
@@ -78,6 +79,7 @@ func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
 	wDone := make(chan struct{})
 
 	defer func() {
+		close(info)
 		<-wDone
 		ctx.Conn.Close()
 		atomic.StoreUint32(&ctx.active, 0)
@@ -86,14 +88,16 @@ func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
 	// writer goroutine
 	go func() {
 		// ensure the last ws writer is closed
-		defer func() { wDone <- struct{}{} }()
+		defer func() { close(wDone) }()
 
-		for i := range info {
+		for b := range info {
 			select {
 			case <-ctx.Done():
 				return
 			default:
-				ctx.Logger.Infof("writer get info %v\n", i)
+				tools.SafeRun(func() {
+					ctx.Logger.Infof("writer get info %v\n", len(b.([]byte)))
+				})
 			}
 		}
 	}()

@@ -25,3 +25,16 @@ func Go[F NestedFunc](f F) {
 		f()
 	}()
 }
+
+func SafeRun[F NestedFunc](f F) {
+	defer func() {
+		if r := recover(); r != nil {
+			Log.WithFields(logrus.Fields{"panicRecover": r}).
+				Errorf("panic during %s\n", runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
+			if err, ok := r.(error); ok {
+				Log.Errorf("err in panic: %v\n", err)
+			}
+		}
+	}()
+	f()
+}
