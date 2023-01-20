@@ -48,7 +48,7 @@ func (ctx *WsClientContext) Cancel() {
 }
 
 func (ctx *WsClientContext) IsActive() bool {
-	return atomic.LoadUint32(&ctx.active) != 0
+	return ctx != nil && atomic.LoadUint32(&ctx.active) != 0
 }
 
 /* NewWsClientContext will try to create context with relevant websocket connection */

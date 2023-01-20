@@ -42,7 +42,7 @@ func (s *WsClient) Serve() (err error) {
 }
 
 func (s *WsClient) IsAlive() bool {
-	return s.ctx.IsActive()
+	return s != nil && s.ctx.IsActive()
 }
 
 /* TODO: add close function details */
