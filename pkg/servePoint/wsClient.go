@@ -1,10 +1,10 @@
 package servepoint
 
 import (
-	"context"
 	"fmt"
 	"time"
 
+	"github.com/AuruTus/Ergo/pkg/handler"
 	wsservice "github.com/AuruTus/Ergo/pkg/utils/websocketService"
 	"github.com/AuruTus/Ergo/tools"
 	"github.com/sirupsen/logrus"
@@ -12,9 +12,9 @@ import (
 
 type WsClient struct {
 	ctx *wsservice.WsClientContext
+	h   handler.Handler
 
 	WSConfig *wsservice.WsClientConfig
-	Handlers []func(context.Context, any, any)
 }
 
 var _ ServePoint = (*WsClient)(nil)
@@ -36,9 +36,13 @@ func (s *WsClient) Serve() (err error) {
 		return fmt.Errorf("connect the host: %w", err)
 	}
 
-	wsservice.ServeWSClientConnection(s.ctx, s.Handlers...)
+	wsservice.ServeWSClientConnection(s.ctx, s.h)
 
 	return
+}
+
+func (s *WsClient) IsAlive() bool {
+	return s.ctx.IsActive()
 }
 
 /* TODO: add close function details */
@@ -48,7 +52,7 @@ func (s *WsClient) Close() error {
 	return nil
 }
 
-func (s *WsClient) initWsClient() (err error) {
+func (s *WsClient) initWsClient(configKey string) (err error) {
 	// TODO load configuration from config file
 	if s.WSConfig, err = wsservice.NewWSClientConfig(); err != nil {
 		return fmt.Errorf("new ws client config: %w", err)
@@ -64,11 +68,12 @@ func (s *WsClient) initWsClient() (err error) {
 	return
 }
 
-func NewWsClient() (ServePoint, error) {
+func NewWsClient(configKey string, h handler.Handler) (ServePoint, error) {
 	s := &WsClient{}
-	if err := s.initWsClient(); err != nil {
+	if err := s.initWsClient(configKey); err != nil {
 		return nil, fmt.Errorf("init ws client: %w", err)
 	}
+	s.h = h
 	return s, nil
 }
 

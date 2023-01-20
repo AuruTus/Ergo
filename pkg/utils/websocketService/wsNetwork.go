@@ -1,11 +1,11 @@
 package websocketService
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"sync/atomic"
 
+	"github.com/AuruTus/Ergo/pkg/handler"
 	"github.com/AuruTus/Ergo/tools"
 	ws "github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -72,7 +72,7 @@ func TryConnect(ctx *WsClientContext, config *WsClientConfig) error {
 	return nil
 }
 
-func ServeWSClientConnection(ctx *WsClientContext, handlers ...func(context.Context, any, any)) {
+func ServeWSClientConnection(ctx *WsClientContext, handler handler.Handler) {
 	// sync between reader and writer
 	info := make(chan interface{}, ctx.writerBufferSize)
 	wDone := make(chan struct{})

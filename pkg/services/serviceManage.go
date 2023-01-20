@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/AuruTus/Ergo/pkg/handler"
 	sp "github.com/AuruTus/Ergo/pkg/servePoint"
 	"github.com/AuruTus/Ergo/tools"
 	"github.com/sirupsen/logrus"
@@ -16,7 +17,6 @@ func init() {
 
 type service struct {
 	servePoint sp.ServePoint
-	active     uint8
 
 	Desc string
 }
@@ -58,10 +58,10 @@ func initGlobalServices() {
 	}
 }
 
-func RegisterNamedService(name string, g sp.ServerPointGenerator, desc string) func() error {
+func RegisterNamedService(name string, g sp.ServerPointGenerator, h handler.Handler, desc string) func() error {
 	// lazy calling
 	return func() error {
-		servePoint, err := g()
+		servePoint, err := g(name, h)
 		if err != nil {
 			return err
 		}
@@ -72,7 +72,6 @@ func RegisterNamedService(name string, g sp.ServerPointGenerator, desc string) f
 
 		sv := &service{
 			servePoint: servePoint,
-			active:     1,
 			Desc:       desc,
 		}
 		if err := services.set(name, sv); err != nil {
