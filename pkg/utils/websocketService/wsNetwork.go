@@ -110,13 +110,12 @@ func ServeWSClientConnection(ctx *WSClientContext, handler handler.Handler) {
 			return
 		default:
 			_, msg, err := ctx.conn.ReadMessage()
-			switch {
-			case err != nil:
+			if err != nil {
 				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
-			default:
-				ctx.Logger.Infof("msg: %s\n", msg)
-				info <- msg
+				continue
 			}
+			ctx.Logger.Infof("msg: %s\n", msg)
+			info <- msg
 		}
 	}
 }

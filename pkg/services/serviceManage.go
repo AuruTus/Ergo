@@ -101,6 +101,8 @@ func StartServicesAll() {
 
 func CloseServicesAll() {
 	for _, s := range services.kv {
-		s.servePoint.Close()
+		tools.SafeRun(func() {
+			s.servePoint.Close()
+		})
 	}
 }
