@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	services "github.com/AuruTus/Ergo/pkg/services"
 	"github.com/AuruTus/Ergo/tools"
@@ -28,6 +29,8 @@ func RunServices() {
 	// case <-services.CloseServicesAll():
 	case <-done:
 	}
+
+	time.Sleep(3 * time.Second)
 }
 
 func main() {

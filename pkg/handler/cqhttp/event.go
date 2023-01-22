@@ -20,7 +20,7 @@ const (
 /*
 	common fileds for posted event json
 */
-type PostCommonFields struct {
+type CommonPostFields struct {
 	// event
 	Time int64 `json:"time"`
 	// qq number of the robot
@@ -33,7 +33,7 @@ type PostCommonFields struct {
 	Message events are for things like group and private chat message
 */
 type PostMessage struct {
-	PostCommonFields
+	CommonPostFields
 	MessageType string `json:"message_type"`
 	SubType     string `json:"sub_type"`
 	MessageID   int32  `json:"message_id"`
@@ -50,13 +50,13 @@ type PostMessage struct {
 /*
 	The same as Message, but it's sent from bot.
 */
-type MessageSentPosted PostMessage
+type PostMessageSent PostMessage
 
 /*
 	Notice events are for things like group member notification
 */
 type PostNotice struct {
-	PostCommonFields
+	CommonPostFields
 	NoticeType string `json:"notice_type"`
 	// TODO complete
 }
@@ -65,7 +65,7 @@ type PostNotice struct {
 	Request events are for things like group member notification
 */
 type PostRequest struct {
-	PostCommonFields
+	CommonPostFields
 	RequestType string `json:"request_type"`
 	// TODO complete
 }
@@ -74,7 +74,7 @@ type PostRequest struct {
 	Meta Event events are for things like cqhttp heatbeat
 */
 type PostMetaEvent struct {
-	PostCommonFields
+	CommonPostFields
 	MetaEventType string `json:"meta_event_type"`
 	// TODO complete
 }

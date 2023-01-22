@@ -1,8 +1,10 @@
 package websocketService
 
 import (
+	"errors"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
 	"github.com/AuruTus/Ergo/tools"
@@ -72,13 +74,13 @@ func TryConnect(ctx *WSClientContext, config *WSClientConfig) error {
 	return nil
 }
 
-func ServeWSClientConnection(ctx *WSClientContext, handler handler.Handler) {
+func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 	// sync between reader and writer
-	info := make(chan interface{}, ctx.writerBufferSize)
+	msgBuffer := make(chan []byte, ctx.writerBufferSize)
 	wDone := make(chan struct{})
 
 	defer func() {
-		close(info)
+		close(msgBuffer)
 		<-wDone
 		ctx.closeConn()
 		ctx.deactivate()
@@ -91,13 +93,14 @@ func ServeWSClientConnection(ctx *WSClientContext, handler handler.Handler) {
 		// ensure the last ws writer is closed
 		defer func() { close(wDone) }()
 
-		for b := range info {
+		for msg := range msgBuffer {
 			select {
 			case <-ctx.Done():
 				return
 			default:
 				tools.SafeRun(func() {
-					ctx.Logger.Infof("writer get info %v\n", len(b.([]byte)))
+					ctx.Logger.Infof("writer gets %d info: %s\n", len(msg), msg)
+					h.HandleWrite(ctx.conn, msg)
 				})
 			}
 		}
@@ -109,14 +112,21 @@ func ServeWSClientConnection(ctx *WSClientContext, handler handler.Handler) {
 		case <-ctx.Done():
 			return
 		default:
-			_, msg, err := ctx.conn.ReadMessage()
-			if err != nil {
-				ctx.Logger.WithFields(logrus.Fields{"err": err}).Errorf("error when received message\n")
+			msg, err := h.HandleRead(ctx.conn)
+			// todo complete error check
+			switch {
+			case errors.Is(err, handler.ErrWSControlMsg) ||
+				errors.Is(err, handler.ErrWSResponseMsg):
 				continue
+			case err != nil:
+				ctx.Logger.Infof("get err: %v\n", err)
+				continue
+			default:
+				ctx.Logger.Infof("reader sends %d info: %s\n", len(msg), msg)
+				msgBuffer <- msg
 			}
-			ctx.Logger.Infof("msg: %s\n", msg)
-			info <- msg
 		}
+		time.Sleep(time.Second)
 	}
 }
 

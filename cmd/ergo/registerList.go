@@ -9,5 +9,5 @@ import (
 
 // TODO: add a code generator to get code from config files
 var registerList = [](func() error){
-	services.RegisterNamedService[handler.WSClientHandler]("cqhttp-ws-client", sp.NewWSClient, &cqhttpHandler.WSClientHandler{}, "cqhttp for feifei"),
+	services.RegisterNamedService[handler.WSClientHandler]("cqhttp-ws-client", sp.NewWSClient, cqhttpHandler.NewWSClientHandler(), "cqhttp for feifei"),
 }
