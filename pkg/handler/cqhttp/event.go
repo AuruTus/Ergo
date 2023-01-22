@@ -1,4 +1,4 @@
-package cqhttpHandler
+package cqhttp
 
 /*
 	NOTE: The event is the json text posted by server. Ref: https://docs.go-cqhttp.org/event/

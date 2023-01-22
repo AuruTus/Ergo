@@ -1,4 +1,4 @@
-package cqhttpHandler
+package cqhttp
 
 import (
 	"github.com/AuruTus/Ergo/pkg/handler"
