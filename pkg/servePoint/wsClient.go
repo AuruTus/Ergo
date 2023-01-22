@@ -84,7 +84,7 @@ func (s *WSClient) initWSClient(configKey string) (err error) {
 	return
 }
 
-func NewWSClient(configKey string, h handler.Handler) (ServePoint, error) {
+func NewWSClient(configKey string, h handler.WSClientHandler) (ServePoint, error) {
 	s := &WSClient{}
 	if err := s.initWSClient(configKey); err != nil {
 		return nil, fmt.Errorf("init ws client: %w", err)
@@ -92,5 +92,3 @@ func NewWSClient(configKey string, h handler.Handler) (ServePoint, error) {
 	s.h = h
 	return s, nil
 }
-
-var _ ServerPointGenerator = NewWSClient

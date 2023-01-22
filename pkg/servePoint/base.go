@@ -12,4 +12,4 @@ type ServePoint interface {
 	Close() error
 }
 
-type ServerPointGenerator (func(configKey string, h handler.Handler) (ServePoint, error))
+type ServerPointGenerator[H handler.Handler] (func(configKey string, h H) (ServePoint, error))

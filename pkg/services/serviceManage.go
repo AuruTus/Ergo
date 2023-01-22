@@ -58,7 +58,7 @@ func initGlobalServices() {
 	}
 }
 
-func RegisterNamedService(name string, g sp.ServerPointGenerator, h handler.Handler, desc string) func() error {
+func RegisterNamedService[H handler.Handler](name string, g sp.ServerPointGenerator[H], h H, desc string) func() error {
 	// lazy calling
 	return func() error {
 		servePoint, err := g(name, h)
