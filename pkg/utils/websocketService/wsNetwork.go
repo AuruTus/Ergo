@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"time"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
 	"github.com/AuruTus/Ergo/tools"
@@ -99,7 +98,7 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 				return
 			default:
 				tools.SafeRun(func() {
-					ctx.Logger.Infof("writer gets %d info: %s\n", len(msg), msg)
+					// ctx.Logger.Infof("writer gets %d info: %s\n", len(msg), msg)
 					h.HandleWrite(ctx.conn, msg)
 				})
 			}
@@ -115,18 +114,17 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 			msg, err := h.HandleRead(ctx.conn)
 			// todo complete error check
 			switch {
-			case errors.Is(err, handler.ErrWSControlMsg) ||
-				errors.Is(err, handler.ErrWSResponseMsg):
-				continue
+			case errors.Is(err, handler.ErrWSControlMsg):
+			case errors.Is(err, handler.ErrWSResponseMsg):
+				ctx.Logger.Infof("handler get response: %s\n", msg)
 			case err != nil:
-				ctx.Logger.Infof("get err: %v\n", err)
-				continue
+				ctx.Logger.Infof("websocket client gets err: %v\n", err)
+				return
 			default:
 				ctx.Logger.Infof("reader sends %d info: %s\n", len(msg), msg)
 				msgBuffer <- msg
 			}
 		}
-		time.Sleep(time.Second)
 	}
 }
 
