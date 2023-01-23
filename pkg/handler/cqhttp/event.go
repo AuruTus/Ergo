@@ -38,8 +38,7 @@ type PostMessage struct {
 	SubType     string `json:"sub_type"`
 	MessageID   int32  `json:"message_id"`
 	// the sender's qq number
-	UserID int64 `json:"user_id"`
-	// TODO confirm message type structure
+	UserID  int64  `json:"user_id"`
 	Message string `json:"message"`
 	// the message in cq code format
 	RawMessage string `json:"raw_message"`

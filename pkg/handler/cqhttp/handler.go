@@ -3,7 +3,6 @@ package cqhttp
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
 	ws "github.com/gorilla/websocket"
@@ -25,6 +24,10 @@ func (h *WSClientHandler) HandleRead(c *ws.Conn) ([]byte, error) {
 	}
 
 	return h.msgSwitch(c, msg)
+}
+
+func (h *WSClientHandler) HandleWrite(c *ws.Conn, msg []byte) error {
+	return c.WriteMessage(ws.TextMessage, msg)
 }
 
 func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
@@ -60,23 +63,4 @@ func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
 	}
 
 	return msg, err
-}
-
-func (h *WSClientHandler) echoHelloPrivate(c *ws.Conn, targetUserID int64) ([]byte, error) {
-	hello := &ActionSendPrivate{
-		CommonActionFields: CommonActionFields{
-			Action: API_SEND_PRIVATE_MSG,
-			Echo:   fmt.Sprintf("%s-%d", API_SEND_PRIVATE_MSG, time.Now().UnixMicro()),
-		},
-		Params: ParamsSendPrivateAction{
-			UserID:     targetUserID,
-			Message:    "[CQ:face,id=13]Hello,sir!",
-			AutoEscape: false,
-		},
-	}
-	return json.Marshal(hello)
-}
-
-func (h *WSClientHandler) HandleWrite(c *ws.Conn, msg []byte) error {
-	return c.WriteMessage(ws.TextMessage, msg)
 }
