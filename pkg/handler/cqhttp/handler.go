@@ -44,7 +44,9 @@ func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
 		json.Unmarshal(msg, message)
 		return h.echoHelloPrivate(c, message.UserID)
 	case POST_TYPE_NOTICE:
+		fallthrough
 	case POST_TYPE_REQUEST:
+		return nil, handler.ErrUnimplemented
 	case POST_TYPE_META_EVENT:
 		return msg, handler.ErrWSControlMsg
 	default:

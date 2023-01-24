@@ -70,7 +70,7 @@ type PostRequest struct {
 }
 
 /*
-	Meta Event events are for things like cqhttp heatbeat
+	Meta Event events are for things like cqhttp heartbeat
 */
 type PostMetaEvent struct {
 	CommonPostFields

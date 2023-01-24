@@ -117,11 +117,13 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 			case errors.Is(err, handler.ErrWSControlMsg):
 			case errors.Is(err, handler.ErrWSResponseMsg):
 				ctx.Logger.Infof("handler get response: %s\n", msg)
+			case errors.Is(err, handler.ErrUnimplemented):
 			case err != nil:
-				ctx.Logger.Infof("websocket client gets err: %v\n", err)
+				// Unexoected errror, don't handle it.
+				ctx.Logger.Infof("unexpected websocket err: %v\n", err)
 				return
 			default:
-				ctx.Logger.Infof("reader sends %d info: %s\n", len(msg), msg)
+				// ctx.Logger.Infof("reader sends %d info: %s\n", len(msg), msg)
 				msgBuffer <- msg
 			}
 		}

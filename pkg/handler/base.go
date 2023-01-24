@@ -22,3 +22,5 @@ type WSClientHandler interface {
 var ErrWSControlMsg = errors.New("control msg")
 
 var ErrWSResponseMsg = errors.New("response msg")
+
+var ErrUnimplemented = errors.New("Unimplemented")
