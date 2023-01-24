@@ -84,7 +84,7 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 		ctx.closeConn()
 		ctx.deactivate()
 		ctx.Logger.Infof("connection with host %s closed\n", ctx.conn.RemoteAddr().String())
-		ctx.Logger.Infof("context %s is deactive, ws client is down", ctx.CID)
+		ctx.Logger.Infof("context %s is deactive, ws client is down\n", ctx.CID)
 	}()
 
 	// writer goroutine

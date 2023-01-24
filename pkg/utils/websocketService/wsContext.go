@@ -42,7 +42,7 @@ func (ctx *WSClientContext) closeConn() {
 }
 
 func (ctx *WSClientContext) deactivate() {
-	if ctx != nil {
+	if ctx == nil {
 		return
 	}
 	atomic.StoreUint32(&ctx.active, 0)
