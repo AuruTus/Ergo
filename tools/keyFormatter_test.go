@@ -3,8 +3,6 @@ package tools
 import (
 	"fmt"
 	"testing"
-
-	"github.com/AuruTus/Ergo/pkg/handler/cqhttp"
 )
 
 func TestKeyGen(t *testing.T) {
@@ -17,8 +15,8 @@ func TestKeyGen(t *testing.T) {
 	ip := &i
 	args := []testArg{
 		{
-			tokens:   []any{cqhttp.API_SEND_PRIVATE_MSG, i},
-			expected: fmt.Sprintf("%s-%d", cqhttp.API_SEND_PRIVATE_MSG, i),
+			tokens:   []any{"wsd呜dggrt中", i},
+			expected: fmt.Sprintf("%s-%d", "wsd呜dggrt中", i),
 		},
 		{
 			tokens:   []any{"abc", ip, i},
