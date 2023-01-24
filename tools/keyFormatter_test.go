@@ -1,0 +1,44 @@
+package tools
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/AuruTus/Ergo/pkg/handler/cqhttp"
+)
+
+func TestKeyGen(t *testing.T) {
+	type testArg struct {
+		tokens   []any
+		expected string
+	}
+
+	i := 321883312
+	ip := &i
+	args := []testArg{
+		{
+			tokens:   []any{cqhttp.API_SEND_PRIVATE_MSG, i},
+			expected: fmt.Sprintf("%s-%d", cqhttp.API_SEND_PRIVATE_MSG, i),
+		},
+		{
+			tokens:   []any{"abc", ip, i},
+			expected: fmt.Sprintf("%s-%p-%d", "abc", ip, i),
+		},
+		{
+			tokens:   []any{ip},
+			expected: fmt.Sprintf("%p", ip),
+		},
+		{
+			tokens:   []any{"abc", -1234},
+			expected: fmt.Sprintf("%s-m%d", "abc", 1234),
+		},
+	}
+
+	for i, a := range args {
+		k := KeyGen(a.tokens...)
+		t.Logf("key: %s\n", k)
+		if k != a.expected {
+			t.Errorf("case %d key unmatched: %v, %v\n", i, k, a.tokens)
+		}
+	}
+}
