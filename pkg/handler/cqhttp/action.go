@@ -15,28 +15,52 @@ type CommonResponseFields struct {
 
 const (
 	API_SEND_PRIVATE_MSG = "send_private_msg"
+	API_SNED_GROUP_MSG   = "send_group_msg"
 )
 
 /*
 	api: send_private_msg
 */
-type ParamsSendPrivateAction struct {
+type ParamsSendPrivateMsg struct {
 	UserID     int64  `json:"user_id"`
 	GroupID    int64  `json:"group_id,omitempty"`
 	Message    string `json:"message"`
 	AutoEscape bool   `json:"auto_escape"`
 }
 
-type ActionSendPrivate struct {
+type ActionSendPrivateMsg struct {
 	CommonActionFields
-	Params ParamsSendPrivateAction `json:"params"`
+	Params ParamsSendPrivateMsg `json:"params"`
 }
 
-type DataSendPrivate struct {
+type DataSendPrivateMsg struct {
 	MessageID int32 `json:"message_id"`
 }
 
-type ResponseSendPrivate struct {
+type ResponseSendPrivateMsg struct {
 	CommonResponseFields
-	Data DataSendPrivate `json:"data"`
+	Data DataSendPrivateMsg `json:"data"`
+}
+
+/*
+	api: send_group_msg
+*/
+type ParamsSendGroupMsg struct {
+	GroupID    int64  `json:"group_id"`
+	Message    string `json:"message"`
+	AutoEscape bool   `json:"auto_escape"`
+}
+
+type ActionSendGroupMsg struct {
+	CommonActionFields
+	Params ParamsSendGroupMsg `json:"params"`
+}
+
+type DataSendGroupMsg struct {
+	MessageID int32 `json:"message_id"`
+}
+
+type ResponseSendGroupMsg struct {
+	CommonResponseFields
+	Data DataSendGroupMsg `json:"data"`
 }

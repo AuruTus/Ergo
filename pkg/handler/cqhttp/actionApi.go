@@ -2,9 +2,9 @@ package cqhttp
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
+	"github.com/AuruTus/Ergo/tools"
 	ws "github.com/gorilla/websocket"
 )
 
@@ -15,17 +15,39 @@ func (h *WSClientHandler) echoHelloPrivate(c *ws.Conn, targetUserID int64) ([]by
 	return h.sendPrivateInfo(c, targetUserID, "[CQ:face,id=13]Hello,sir!")
 }
 
+func (h *WSClientHandler) echoHelloGroup(c *ws.Conn, targetGroupID int64) ([]byte, error) {
+	return h.sendGroupMsg(c, targetGroupID, "[CQ:face,id=13]Hello,sir!")
+}
+
 /*
 	API: send_private_msg
 */
 func (h *WSClientHandler) sendPrivateInfo(c *ws.Conn, targetUserID int64, msg string) ([]byte, error) {
-	action := &ActionSendPrivate{
+	action := &ActionSendPrivateMsg{
 		CommonActionFields: CommonActionFields{
 			Action: API_SEND_PRIVATE_MSG,
-			Echo:   fmt.Sprintf("%s-%d", API_SEND_PRIVATE_MSG, time.Now().UnixMicro()),
+			Echo:   tools.KeyGen(API_SEND_PRIVATE_MSG, time.Now().UnixMicro()),
 		},
-		Params: ParamsSendPrivateAction{
+		Params: ParamsSendPrivateMsg{
 			UserID:     targetUserID,
+			Message:    msg,
+			AutoEscape: false,
+		},
+	}
+	return json.Marshal(action)
+}
+
+/*
+	api: send_group_msg
+*/
+func (h *WSClientHandler) sendGroupMsg(c *ws.Conn, targetGroupID int64, msg string) ([]byte, error) {
+	action := &ActionSendGroupMsg{
+		CommonActionFields: CommonActionFields{
+			Action: API_SNED_GROUP_MSG,
+			Echo:   tools.KeyGen(API_SNED_GROUP_MSG, time.Now().UnixMicro()),
+		},
+		Params: ParamsSendGroupMsg{
+			GroupID:    targetGroupID,
 			Message:    msg,
 			AutoEscape: false,
 		},
