@@ -97,7 +97,7 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 			case <-ctx.Done():
 				return
 			default:
-				tools.SafeRun(func() {
+				tools.WithRecover(func() {
 					// ctx.Logger.Infof("writer gets %d info: %s\n", len(msg), msg)
 					h.HandleWrite(ctx.conn, msg)
 				})
