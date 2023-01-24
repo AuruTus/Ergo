@@ -116,7 +116,7 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 			switch {
 			case errors.Is(err, handler.ErrWSControlMsg):
 			case errors.Is(err, handler.ErrWSResponseMsg):
-				ctx.Logger.Infof("handler get response: %s\n", msg)
+				ctx.Logger.Infof("handler get response: %s", msg)
 			case errors.Is(err, handler.ErrUnimplemented):
 			case err != nil:
 				// Unexoected errror, don't handle it.

@@ -29,21 +29,32 @@ type CommonPostFields struct {
 	PostType PostType `json:"post_type"`
 }
 
+type MessageType string
+
+const (
+	MESSAGE_TYPE_PRIVATE MessageType = "private"
+	MESSAGE_TYPE_GROUP   MessageType = "group"
+)
+
+type Sender struct {
+}
+
 /*
 	Message events are for things like group and private chat message
 */
 type PostMessage struct {
 	CommonPostFields
-	MessageType string `json:"message_type"`
-	SubType     string `json:"sub_type"`
-	MessageID   int32  `json:"message_id"`
+	MessageType MessageType `json:"message_type"`
+	SubType     string      `json:"sub_type"`
+	MessageID   int32       `json:"message_id"`
 	// the sender's qq number
-	UserID  int64  `json:"user_id"`
+	UserID int64 `json:"user_id"`
+	// the group's qq number
+	GroupID int64  `json:"group_id"`
 	Message string `json:"message"`
-	// the message in cq code format
+	// the message string in cq code format
 	RawMessage string `json:"raw_message"`
 	Font       int    `json:"font"`
-	Object     string `json:"object"`
 }
 
 /*
@@ -61,7 +72,7 @@ type PostNotice struct {
 }
 
 /*
-	Request events are for things like group member notification
+	Request events are for things like making-friend request
 */
 type PostRequest struct {
 	CommonPostFields

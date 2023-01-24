@@ -31,18 +31,15 @@ func (h *WSClientHandler) HandleWrite(c *ws.Conn, msg []byte) error {
 }
 
 func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
-	// post evnet
+	// post event
 	post := &CommonPostFields{}
-	err := json.Unmarshal(msg, post)
-	if err != nil {
+	if err := json.Unmarshal(msg, post); err != nil {
 		return nil, fmt.Errorf("unmarshal message: %w", err)
 	}
 
 	switch post.PostType {
 	case POST_TYPE_MESSAGE, POST_TYPE_MESSAGE_SENT:
-		message := &PostMessage{}
-		json.Unmarshal(msg, message)
-		return h.echoHelloPrivate(c, message.UserID)
+		return h.handlePostMessage(c, msg)
 	case POST_TYPE_NOTICE:
 		fallthrough
 	case POST_TYPE_REQUEST:
@@ -54,8 +51,7 @@ func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
 
 	// api response
 	resp := &CommonResponseFields{}
-	err = json.Unmarshal(msg, resp)
-	if err != nil {
+	if err := json.Unmarshal(msg, resp); err != nil {
 		return nil, fmt.Errorf("unmarshal message: %w", err)
 	}
 
@@ -64,5 +60,19 @@ func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
 		return msg, handler.ErrWSResponseMsg
 	}
 
-	return msg, err
+	return msg, nil
+}
+
+func (h *WSClientHandler) handlePostMessage(c *ws.Conn, msg []byte) ([]byte, error) {
+	message := &PostMessage{}
+	if err := json.Unmarshal(msg, message); err != nil {
+		return msg, err
+	}
+	switch message.MessageType {
+	case MESSAGE_TYPE_PRIVATE:
+		return h.echoHelloPrivate(c, message.UserID)
+	case MESSAGE_TYPE_GROUP:
+		return h.echoHelloGroup(c, message.GroupID)
+	}
+	return nil, handler.ErrUnimplemented
 }

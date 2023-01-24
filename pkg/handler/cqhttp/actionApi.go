@@ -20,7 +20,7 @@ func (h *WSClientHandler) echoHelloGroup(c *ws.Conn, targetGroupID int64) ([]byt
 }
 
 /*
-	API: send_private_msg
+	api: send_private_msg
 */
 func (h *WSClientHandler) sendPrivateInfo(c *ws.Conn, targetUserID int64, msg string) ([]byte, error) {
 	action := &ActionSendPrivateMsg{
