@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
+	"github.com/AuruTus/Ergo/tools"
 	ws "github.com/gorilla/websocket"
 )
 
@@ -32,7 +33,7 @@ func (h *WSClientHandler) HandleWrite(c *ws.Conn, msg []byte) error {
 
 func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
 	// post event
-	post := &CommonPostFields{}
+	post := new(CommonPostFields)
 	if err := json.Unmarshal(msg, post); err != nil {
 		return nil, fmt.Errorf("unmarshal message: %w", err)
 	}
@@ -50,7 +51,7 @@ func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
 	}
 
 	// api response
-	resp := &CommonResponseFields{}
+	resp := new(CommonResponseFields)
 	if err := json.Unmarshal(msg, resp); err != nil {
 		return nil, fmt.Errorf("unmarshal message: %w", err)
 	}
@@ -64,10 +65,11 @@ func (h *WSClientHandler) msgSwitch(c *ws.Conn, msg []byte) ([]byte, error) {
 }
 
 func (h *WSClientHandler) handlePostMessage(c *ws.Conn, msg []byte) ([]byte, error) {
-	message := &PostMessage{}
+	message := new(PostMessage)
 	if err := json.Unmarshal(msg, message); err != nil {
 		return msg, err
 	}
+	tools.Log.Infof("raw_msg: %s\n", message.RawMessage)
 	switch message.MessageType {
 	case MESSAGE_TYPE_PRIVATE:
 		return h.echoHelloPrivate(c, message.UserID)
