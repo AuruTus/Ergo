@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
-	"github.com/AuruTus/Ergo/tools"
+	chatcmd "github.com/AuruTus/Ergo/pkg/handler/cqhttp/chatCmd"
 	ws "github.com/gorilla/websocket"
 )
 
@@ -69,12 +69,11 @@ func (h *WSClientHandler) handlePostMessage(c *ws.Conn, msg []byte) ([]byte, err
 	if err := json.Unmarshal(msg, message); err != nil {
 		return msg, err
 	}
-	tools.Log.Infof("raw_msg: %s\n", message.RawMessage)
 	switch message.MessageType {
 	case MESSAGE_TYPE_PRIVATE:
-		return h.echoHelloPrivate(c, message.UserID)
+		return h.sendPrivateInfo(c, message.UserID, string(chatcmd.Parse(message.RawMessage).Excute()))
 	case MESSAGE_TYPE_GROUP:
-		return h.echoHelloGroup(c, message.GroupID)
+		return h.sendGroupMsg(c, message.GroupID, string(chatcmd.Parse(message.RawMessage).Excute()))
 	}
 	return nil, handler.ErrUnimplemented
 }

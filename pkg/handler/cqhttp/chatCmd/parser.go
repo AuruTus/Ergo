@@ -45,8 +45,7 @@ func buildCmdNode(c *cmdNode, tokens []string) {
 	)
 
 	pre := ARG
-	restTs := tokens[1:]
-	for _, t := range restTs {
+	for _, t := range tokens {
 		switch {
 		// option: token starts with '-' or '--'
 		case t[0] == '-':
@@ -67,21 +66,30 @@ func buildCmdNode(c *cmdNode, tokens []string) {
 	}
 }
 
-func CmdLexer(raw []byte) *cmdNode {
-	// split tokens
-	tokens := strings.FieldsFunc(string(raw), func(r rune) bool {
+func cmdLexer(raw string) []string {
+	tokens := strings.FieldsFunc(raw, func(r rune) bool {
 		switch r {
 		case '\n', '\t', '\r', ' ':
 			return true
 		}
 		return false
 	})
+	return tokens
+}
 
+func cmdParser(tokens []string) *cmdNode {
 	c := initCmdNode(tokens[0])
 	buildCmdNode(c, tokens[1:])
 	return c
 }
 
-func (c *cmdNode) Excute() []byte {
-	return commands[c.cmd].handle(c)
+func Parse(raw string) *cmdNode {
+	return cmdParser(cmdLexer(raw))
+}
+
+func (c *cmdNode) Excute() string {
+	if h, ok := commands[c.cmd]; ok {
+		return h.handle(c)
+	}
+	return defaultHandle(c)
 }

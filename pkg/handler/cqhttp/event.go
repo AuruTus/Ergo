@@ -36,9 +36,6 @@ const (
 	MESSAGE_TYPE_GROUP   MessageType = "group"
 )
 
-type Sender struct {
-}
-
 /*
 	Message events are for things like group and private chat message
 */
@@ -50,9 +47,10 @@ type PostMessage struct {
 	// the sender's qq number
 	UserID int64 `json:"user_id"`
 	// the group's qq number
-	GroupID int64  `json:"group_id"`
-	Message string `json:"message"`
-	// the message string in cq code format
+	GroupID int64 `json:"group_id"`
+	// the json structured message array
+	Message []map[string]any `json:"message"`
+	// the raw message string in cq code format
 	RawMessage string `json:"raw_message"`
 	Font       int    `json:"font"`
 }

@@ -1,11 +1,16 @@
 package chatcmd
 
-import "sync"
+import (
+	"sync"
+)
+
+type handleFunc (func(*cmdNode) string)
 
 type cmdEntry struct {
-	handle func(*cmdNode) []byte
+	handle handleFunc
 	desc   string
 	info   string
+	cmds   []string
 }
 
 var (
@@ -13,7 +18,7 @@ var (
 	commandsInitOnce sync.Once
 )
 
-func OnCommand(cmdFunc func(*cmdNode) []byte, desc, info string, cmds ...string) {
+func OnCommand(cmdFunc handleFunc, desc, info string, cmds ...string) {
 	// lazy assignment in case of the undefined behaviour of the init() excution order
 	if commands == nil {
 		commandsInitOnce.Do(func() { commands = make(map[string]*cmdEntry) })
@@ -22,6 +27,7 @@ func OnCommand(cmdFunc func(*cmdNode) []byte, desc, info string, cmds ...string)
 		handle: cmdFunc,
 		desc:   desc,
 		info:   info,
+		cmds:   cmds,
 	}
 	for _, cmd := range cmds {
 		commands[cmd] = e
