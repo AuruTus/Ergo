@@ -31,7 +31,7 @@ func KeyGen(args ...any) string {
 		default:
 			continue
 		}
-		b = append(b, []byte(s)...)
+		b = append(b, s...)
 		if i+1 < len(args) {
 			b = append(b, '-')
 		}

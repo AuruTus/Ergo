@@ -36,7 +36,7 @@ func helpHandle(c *cmdNode) string {
 		cmds := append([]byte{}, descLine...)
 		for _, name := range c.cmds {
 			cmds = append(cmds, '.')
-			cmds = append(cmds, []byte(name)...)
+			cmds = append(cmds, name...)
 			cmds = append(cmds, ' ')
 		}
 		cmds[len(cmds)-1] = ':'
@@ -45,7 +45,7 @@ func helpHandle(c *cmdNode) string {
 		cmdBlock := []byte(c.desc)
 		if verboseFlag {
 			cmdBlock = append(cmdBlock, infoLine...)
-			cmdBlock = append(cmdBlock, []byte(c.info)...)
+			cmdBlock = append(cmdBlock, c.info...)
 		}
 		cmdBlock = append(cmdBlock, '\n')
 
