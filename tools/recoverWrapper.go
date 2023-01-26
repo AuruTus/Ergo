@@ -1,29 +1,25 @@
 package tools
 
 import (
+	"fmt"
 	"reflect"
 	"runtime"
-
-	"github.com/sirupsen/logrus"
 )
 
 type WrappedFunc interface {
 	~func()
 }
 
-func WithRecover[F WrappedFunc](f F) {
+func WithRecover[F WrappedFunc](f F) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			Log.WithFields(logrus.Fields{"panicRecover": r}).
-				Errorf("panic during %s\n", runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name())
-			if err, ok := r.(error); ok {
-				Log.Errorf("err in panic: %v\n", err)
-			}
+			err = fmt.Errorf(
+				"panic during %s recovered: %+v",
+				runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name(),
+				r,
+			)
 		}
 	}()
 	f()
-}
-
-func Go[F WrappedFunc](f F) {
-	go WithRecover(f)
+	return
 }

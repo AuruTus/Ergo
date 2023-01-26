@@ -97,10 +97,13 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 			case <-ctx.Done():
 				return
 			default:
-				tools.WithRecover(func() {
+				if err := tools.WithRecover(func() {
 					// ctx.Logger.Infof("writer gets %d info: %s\n", len(msg), msg)
 					h.HandleWrite(ctx.conn, msg)
-				})
+				}); err != nil {
+					ctx.Logger.WithFields(logrus.Fields{"msg": msg}).
+						Infof("ws writer: %v", err)
+				}
 			}
 		}
 	}()

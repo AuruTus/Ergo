@@ -90,19 +90,25 @@ func RegisterServicesAll(registerList [](func() error)) {
 }
 
 func StartServicesAll() {
-	for _, s := range services.kv {
-		tools.Go(func() {
-			if err := s.servePoint.Serve(); err != nil {
-				panic(fmt.Errorf("%T serving: %w", s.servePoint, err))
+	for k, s := range services.kv {
+		go func(key string, s *service) {
+			if err := tools.WithRecover(func() {
+				if err := s.servePoint.Serve(); err != nil {
+					panic(fmt.Errorf("service %s with %T serving: %w", key, s.servePoint, err))
+				}
+			}); err != nil {
+				tools.Log.Infof("%v", err)
 			}
-		})
+		}(k, s)
 	}
 }
 
 func CloseServicesAll() {
-	for _, s := range services.kv {
-		tools.WithRecover(func() {
+	for k, s := range services.kv {
+		if err := tools.WithRecover(func() {
 			s.servePoint.Close()
-		})
+		}); err != nil {
+			tools.Log.Infof("unable to close service %v: %v", k, err)
+		}
 	}
 }

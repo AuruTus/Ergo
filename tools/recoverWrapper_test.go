@@ -7,41 +7,50 @@ import (
 	"time"
 )
 
-func namedFunc_1() { panic(fmt.Errorf("named func with error content")) }
-func namedFunc_2() { panic("named func with string content") }
+func _goRecover[F WrappedFunc](f F) {
+	go func() {
+		if err := WithRecover(f); err != nil {
+			fmt.Printf("%v\n", err)
+		}
+	}()
+}
+
+func _namedFunc_1() { panic(fmt.Errorf("named func with error content")) }
+func _namedFunc_2() { panic("named func with string content") }
 
 func TestPrintPanicFunction(t *testing.T) {
 	wg := sync.WaitGroup{}
 
-	Go(func() {
-		wg.Add(1)
-		Go(func() { panic(fmt.Errorf("anonymous func with error content")) })
+	wg.Add(1)
+	go func() {
+		_goRecover(func() { panic(fmt.Errorf("anonymous func with error content")) })
 		t.Logf("goroutine sent\n")
 		time.Sleep(time.Second)
 		wg.Done()
-	})
-	Go(func() {
-		wg.Add(1)
-		Go(func() { panic("anonymous func with string content") })
-		time.Sleep(time.Second)
-		wg.Done()
-	})
+	}()
 
-	Go(func() {
-		wg.Add(1)
-		Go(namedFunc_1)
-		t.Logf("goroutine sent\n")
+	wg.Add(1)
+	go func() {
+		_goRecover(func() { panic("anonymous func with string content") })
 		time.Sleep(time.Second)
 		wg.Done()
-	})
+	}()
 
-	Go(func() {
-		wg.Add(1)
-		Go(namedFunc_2)
+	wg.Add(1)
+	go func() {
+		_goRecover(_namedFunc_1)
 		t.Logf("goroutine sent\n")
 		time.Sleep(time.Second)
 		wg.Done()
-	})
+	}()
+
+	wg.Add(1)
+	go func() {
+		_goRecover(_namedFunc_2)
+		t.Logf("goroutine sent\n")
+		time.Sleep(time.Second)
+		wg.Done()
+	}()
 
 	testRecover := func() {
 		defer func() {
@@ -52,15 +61,14 @@ func TestPrintPanicFunction(t *testing.T) {
 		t.Logf("send panic\n")
 		panic("normal panic")
 	}
-	Go(func() {
-		wg.Add(1)
+	wg.Add(1)
+	go func() {
 		testRecover()
 		t.Logf("panic recovered\n")
 		time.Sleep(time.Second)
 		wg.Done()
-	})
+	}()
 
 	wg.Wait()
-	time.Sleep(5 * time.Second)
 	Log.Infof("happy endding\n")
 }
