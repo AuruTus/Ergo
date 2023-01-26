@@ -18,8 +18,8 @@ const (
 )
 
 type CQCodeNode struct {
-	Type string            `json:"type"`
-	Data map[string]string `json:"data"`
+	Type string
+	Data map[string]string
 }
 
 func ParseCQCode(code string) *CQCodeNode {
