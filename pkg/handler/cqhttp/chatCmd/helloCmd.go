@@ -18,6 +18,6 @@ const (
 	`
 )
 
-func helloHandle(c *cmdNode) string {
+func helloHandle(c *CmdNode) string {
 	return "Hello! This is Ergo"
 }

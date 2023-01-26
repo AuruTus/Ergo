@@ -14,13 +14,13 @@ var (
 	infoLine = []byte("\n@ INFO-->\n")
 )
 
-func helpHandle(c *cmdNode) string {
+func helpHandle(c *CmdNode) string {
 	msg := make([]byte, 0, 512)
 
 	verboseFlag := false
-	for _, o := range c.opts {
+	for _, o := range c.Opts {
 		switch {
-		case o.opt == "v" || o.opt == "verbose":
+		case o.Opt == "v" || o.Opt == "verbose":
 			verboseFlag = true
 		}
 	}

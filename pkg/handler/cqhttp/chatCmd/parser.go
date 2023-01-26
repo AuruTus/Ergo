@@ -10,23 +10,23 @@ import (
 	leading characters ('.' for command and '-' or '--' for options).
 */
 
-type optNode struct {
-	opt string
-	arg string
+type OptNode struct {
+	Opt string
+	Arg string
 }
 
-type cmdNode struct {
-	cmd  string
-	opts []optNode
-	args []string
+type CmdNode struct {
+	Cmd  string
+	Opts []OptNode
+	Args []string
 }
 
-func initCmdNode(raw string) *cmdNode {
-	c := &cmdNode{
-		opts: make([]optNode, 0, 4),
-		args: make([]string, 0, 1),
+func initCmdNode(raw string) *CmdNode {
+	c := &CmdNode{
+		Opts: make([]OptNode, 0, 4),
+		Args: make([]string, 0, 1),
 	}
-	c.cmd = raw[1:]
+	c.Cmd = raw[1:]
 	return c
 }
 
@@ -38,7 +38,7 @@ func getValidOpt(raw string) string {
 	return raw[start:]
 }
 
-func buildCmdNode(c *cmdNode, tokens []string) {
+func buildCmdNode(c *CmdNode, tokens []string) {
 	const (
 		ARG = iota
 		OPT
@@ -49,17 +49,17 @@ func buildCmdNode(c *cmdNode, tokens []string) {
 		switch {
 		// option: token starts with '-' or '--'
 		case t[0] == '-':
-			o := optNode{
-				opt: getValidOpt(t),
+			o := OptNode{
+				Opt: getValidOpt(t),
 			}
-			c.opts = append(c.opts, o)
+			c.Opts = append(c.Opts, o)
 			pre = OPT
 		// argument
 		default:
 			if pre == OPT {
-				c.opts[len(c.opts)-1].arg = t
+				c.Opts[len(c.Opts)-1].Arg = t
 			} else {
-				c.args = append(c.args, t)
+				c.Args = append(c.Args, t)
 			}
 			pre = ARG
 		}
@@ -77,18 +77,18 @@ func cmdLexer(raw string) []string {
 	return tokens
 }
 
-func cmdParser(tokens []string) *cmdNode {
+func cmdParser(tokens []string) *CmdNode {
 	c := initCmdNode(tokens[0])
 	buildCmdNode(c, tokens[1:])
 	return c
 }
 
-func Parse(raw string) *cmdNode {
+func Parse(raw string) *CmdNode {
 	return cmdParser(cmdLexer(raw))
 }
 
-func (c *cmdNode) Excute() string {
-	if h, ok := commands[c.cmd]; ok {
+func (c *CmdNode) Excute() string {
+	if h, ok := commands[c.Cmd]; ok {
 		return h.handle(c)
 	}
 	return defaultHandle(c)

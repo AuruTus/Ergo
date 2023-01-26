@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func _compareArray[T interface{ ~string | optNode }](a, b []T) bool {
+func _compareArray[T interface{ ~string | OptNode }](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -16,48 +16,48 @@ func _compareArray[T interface{ ~string | optNode }](a, b []T) bool {
 	return true
 }
 
-func _compareCNode(a, b cmdNode) bool {
-	return a.cmd == b.cmd && _compareArray(a.opts, b.opts) &&
-		_compareArray(a.args, b.args)
+func _compareCNode(a, b CmdNode) bool {
+	return a.Cmd == b.Cmd && _compareArray(a.Opts, b.Opts) &&
+		_compareArray(a.Args, b.Args)
 }
 
 func TestPaser(t *testing.T) {
 	type tArg struct {
 		raw      string
-		expected cmdNode
+		expected CmdNode
 	}
 
 	args := []tArg{
 		{
 			raw: ".hello -i tom tom",
-			expected: cmdNode{
-				cmd: "hello",
-				opts: []optNode{
+			expected: CmdNode{
+				Cmd: "hello",
+				Opts: []OptNode{
 					{"i", "tom"},
 				},
-				args: []string{"tom"},
+				Args: []string{"tom"},
 			},
 		},
 		{
 			raw: ".hello -i tom --verbosetom",
-			expected: cmdNode{
-				cmd: "hello",
-				opts: []optNode{
+			expected: CmdNode{
+				Cmd: "hello",
+				Opts: []OptNode{
 					{"i", "tom"},
 					{"verbosetom", ""},
 				},
-				args: []string{},
+				Args: []string{},
 			},
 		},
 		{
 			raw: ".hello -i tom --verbose tom jack Da大Mi明ng 力LiNing[CQ:face,id=1,name=2]",
-			expected: cmdNode{
-				cmd: "hello",
-				opts: []optNode{
+			expected: CmdNode{
+				Cmd: "hello",
+				Opts: []OptNode{
 					{"i", "tom"},
 					{"verbose", "tom"},
 				},
-				args: []string{"jack", "Da大Mi明ng", "力LiNing[CQ:face,id=1,name=2]"},
+				Args: []string{"jack", "Da大Mi明ng", "力LiNing[CQ:face,id=1,name=2]"},
 			},
 		},
 	}
