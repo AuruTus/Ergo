@@ -28,4 +28,9 @@ test:
 # `func` is the go test function name like `TestNewConfiguredLogger` 
 .PHONY: test-func
 test-func:
-	go test -v -run ${func} ./...
+	go test -v -run ${regex} ./...
+
+
+.PHONY: test-func-bench
+test-func-bench:
+	go test -v -run XXX -bench ${regex} ./...
