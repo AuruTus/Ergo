@@ -7,7 +7,7 @@ import (
 
 type WrappedPanic struct {
 	r         any
-	stackInfo string
+	stackInfo []byte
 }
 
 var _ error = (*WrappedPanic)(nil)
@@ -23,7 +23,7 @@ type WrappedFunc interface {
 func WithRecover[F WrappedFunc](f F) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = &WrappedPanic{r: r, stackInfo: string(debug.Stack())}
+			err = &WrappedPanic{r: r, stackInfo: debug.Stack()}
 		}
 	}()
 	f()
