@@ -2,8 +2,7 @@ package tools
 
 import (
 	"fmt"
-	"reflect"
-	"runtime"
+	"runtime/debug"
 )
 
 type WrappedFunc interface {
@@ -13,11 +12,7 @@ type WrappedFunc interface {
 func WithRecover[F WrappedFunc](f F) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf(
-				"panic during %s recovered: %+v",
-				runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name(),
-				r,
-			)
+			err = fmt.Errorf("panic recovered: %+v\n%s", r, string(debug.Stack()))
 		}
 	}()
 	f()

@@ -16,7 +16,10 @@ func _goRecover[F WrappedFunc](f F) {
 }
 
 func _namedFunc_1() { panic(fmt.Errorf("named func with error content")) }
-func _namedFunc_2() { panic("named func with string content") }
+func _namedFunc_2() {
+	var arr []int
+	fmt.Printf("%d", arr[0])
+}
 
 func TestPrintPanicFunction(t *testing.T) {
 	wg := sync.WaitGroup{}
@@ -48,23 +51,6 @@ func TestPrintPanicFunction(t *testing.T) {
 	go func() {
 		_goRecover(_namedFunc_2)
 		t.Logf("goroutine sent\n")
-		time.Sleep(time.Second)
-		wg.Done()
-	}()
-
-	testRecover := func() {
-		defer func() {
-			if r := recover(); r != nil {
-				t.Logf("panic captured")
-			}
-		}()
-		t.Logf("send panic\n")
-		panic("normal panic")
-	}
-	wg.Add(1)
-	go func() {
-		testRecover()
-		t.Logf("panic recovered\n")
 		time.Sleep(time.Second)
 		wg.Done()
 	}()
