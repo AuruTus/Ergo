@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 func KeyGen(args ...any) string {
 	var s string
-	b := make([]byte, 0, 8)
-	for i, a := range args {
+	keys := make([]string, 0, 8)
+	for _, a := range args {
 		switch v := reflect.ValueOf(a); v.Kind() {
 		case reflect.Pointer:
 			if v.IsNil() {
@@ -31,10 +32,7 @@ func KeyGen(args ...any) string {
 		default:
 			continue
 		}
-		b = append(b, s...)
-		if i+1 < len(args) {
-			b = append(b, '-')
-		}
+		keys = append(keys, s)
 	}
-	return string(b)
+	return strings.Join(keys, "-")
 }
