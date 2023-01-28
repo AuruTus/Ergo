@@ -50,7 +50,7 @@ func TestJsonFieldsGet(t *testing.T) {
 			}`,
 			expected: 4589.0,
 		}, {
-			path: "vis.1.3",
+			path: "vis.1[3]",
 			j: `
 			{
 				"data": {
@@ -63,7 +63,7 @@ func TestJsonFieldsGet(t *testing.T) {
 			}`,
 			expected: uint8('0'),
 		}, {
-			path: "more.0.happy.高兴",
+			path: "more[0].happy.高兴",
 			j: `
 			{
 				"name": "text",

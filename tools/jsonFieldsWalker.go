@@ -29,7 +29,13 @@ func (e *PathError) Error() string {
 
 // getJsonField is a tool to fetch the underlying value of the given path
 func getJsonField[M ~map[string]any](m M, path string) (reflect.Value, error) {
-	p := strings.Split(path, ".")
+	p := strings.FieldsFunc(path, func(r rune) bool {
+		switch r {
+		case '.', '[', ']':
+			return true
+		}
+		return false
+	})
 	nd := reflect.ValueOf(m)
 
 	for range p {
