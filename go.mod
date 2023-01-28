@@ -8,4 +8,11 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 )
 
-require golang.org/x/sys v0.1.0 // indirect
+require (
+	github.com/JohannesKaufmann/html-to-markdown v1.3.6 // indirect
+	github.com/PuerkitoBio/goquery v1.8.0 // indirect
+	github.com/andybalholm/cascadia v1.3.1 // indirect
+	github.com/k3a/html2text v1.1.0 // indirect
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+)
