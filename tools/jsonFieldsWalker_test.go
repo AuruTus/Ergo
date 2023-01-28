@@ -22,6 +22,7 @@ func TestJsonFieldsGet(t *testing.T) {
 					"text": " plz "
 				}
 			}`,
+			expected: "text",
 		}, {
 			path: "vis.h",
 			j: `
@@ -34,6 +35,7 @@ func TestJsonFieldsGet(t *testing.T) {
 					"h": "123"
 				}
 			}`,
+			expected: "123",
 		}, {
 			path: "vis.H",
 			j: `
@@ -46,6 +48,7 @@ func TestJsonFieldsGet(t *testing.T) {
 					"H": 4589
 				}
 			}`,
+			expected: 4589.0,
 		}, {
 			path: "vis.1.3",
 			j: `
@@ -58,6 +61,7 @@ func TestJsonFieldsGet(t *testing.T) {
 					"1": "MTM0YQ=="
 				}
 			}`,
+			expected: uint8('0'),
 		}, {
 			path: "more.0.happy.高兴",
 			j: `
@@ -75,6 +79,7 @@ func TestJsonFieldsGet(t *testing.T) {
 					}
 				]
 			}`,
+			expected: 3.3213,
 		},
 	}
 
@@ -82,13 +87,16 @@ func TestJsonFieldsGet(t *testing.T) {
 		val, err := GetJsonField([]byte(a.j), a.path)
 		if err != nil {
 			if pathErr := (&PathError{}); errors.As(err, &pathErr) {
-				t.Logf("patherr: %v\n\n", pathErr)
+				t.Errorf("patherr: %v\n\n", pathErr)
 			} else if panicErr := (&WrappedPanic{}); errors.As(err, &panicErr) {
-				t.Logf("panicErr: %v\n", panicErr)
+				t.Errorf("panicErr: %v\n", panicErr)
 			} else {
-				t.Logf("%v\n", err)
+				t.Errorf("%v\n", err)
 			}
 		}
 		t.Logf("%+v %+v\n", val.Kind(), val)
+		if val.Interface() != a.expected {
+			t.Errorf("get wrong value %v for expected %v\n", val.Interface(), a.expected)
+		}
 	}
 }
