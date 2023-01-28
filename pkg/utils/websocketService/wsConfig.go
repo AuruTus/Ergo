@@ -5,14 +5,14 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/AuruTus/Ergo/tools"
+	"github.com/AuruTus/Ergo/pkg/utils/logger"
 )
 
 type WSClientConfig struct {
 	HostAddr      net.Addr
 	RequestHeader http.Header
 
-	LogConfigs tools.LogConfigs
+	LogConfigs logger.LogConfigs
 
 	WriterBufferSize int
 }

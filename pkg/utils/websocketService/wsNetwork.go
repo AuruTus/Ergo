@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
+	"github.com/AuruTus/Ergo/pkg/utils/logger"
 	"github.com/AuruTus/Ergo/tools"
 	ws "github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -31,7 +32,7 @@ func ResolveWSAddrFromSocket(socket, api string) (addr *WSAddr, err error) {
 	addr = &WSAddr{}
 	addr.Addr, err = net.ResolveTCPAddr("tcp", socket)
 	if err != nil {
-		tools.Log.WithFields(logrus.Fields{"socket": socket}).Errorf("fail to resolve tcp addr\n")
+		logger.WithFields(logrus.Fields{"socket": socket}).Errorf("fail to resolve tcp addr\n")
 		return nil, fmt.Errorf("resolve TCP addr: %w", err)
 	}
 	addr.Api = api

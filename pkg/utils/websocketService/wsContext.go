@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/AuruTus/Ergo/tools"
+	"github.com/AuruTus/Ergo/pkg/utils/logger"
 	"github.com/google/uuid"
 	ws "github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -67,7 +67,7 @@ func NewWSClientContext(config *WSClientConfig) (*WSClientContext, error) {
 
 	ctx.Context, ctx.Cancel = context.WithCancel(context.Background())
 	ctx.dialer = ws.DefaultDialer
-	ctx.Logger = tools.NewConfiguredLogger(config.LogConfigs)
+	ctx.Logger = logger.NewConfiguredLogger(config.LogConfigs)
 
 	ctx.writerBufferSize = DEFAULT_WRITER_BUFFER_SIZE
 	if config.WriterBufferSize > 0 {

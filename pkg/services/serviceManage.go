@@ -6,6 +6,7 @@ import (
 
 	"github.com/AuruTus/Ergo/pkg/handler"
 	sp "github.com/AuruTus/Ergo/pkg/servePoint"
+	"github.com/AuruTus/Ergo/pkg/utils/logger"
 	"github.com/AuruTus/Ergo/tools"
 	"github.com/sirupsen/logrus"
 )
@@ -84,7 +85,7 @@ func RegisterNamedService[H handler.Handler](name string, g sp.ServerPointGenera
 func RegisterServicesAll(registerList [](func() error)) {
 	for i, f := range registerList {
 		if err := f(); err != nil {
-			tools.Log.WithFields(logrus.Fields{"error": err}).Errorf("start service %v failed\n", i)
+			logger.WithFields(logrus.Fields{"error": err}).Errorf("start service %v failed\n", i)
 		}
 	}
 }
@@ -97,7 +98,7 @@ func StartServicesAll() {
 					panic(fmt.Errorf("service %s with %T serving: %w", key, s.servePoint, err))
 				}
 			}); err != nil {
-				tools.Log.Infof("%v", err)
+				logger.Infof("%v", err)
 			}
 		}(k, s)
 	}
@@ -108,7 +109,7 @@ func CloseServicesAll() {
 		if err := tools.WithRecover(func() {
 			s.servePoint.Close()
 		}); err != nil {
-			tools.Log.Infof("unable to close service %v: %v", k, err)
+			logger.Infof("unable to close service %v: %v", k, err)
 		}
 	}
 }

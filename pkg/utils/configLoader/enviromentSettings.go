@@ -1,6 +1,8 @@
-package tools
+package configLoader
 
-import "flag"
+import (
+	"flag"
+)
 
 /*
 	ServiceArgs maintains the enviroment varaibles needed and command
@@ -11,17 +13,6 @@ type ServiceArgs struct {
 }
 
 var EnviromentSettings ServiceArgs
-
-/*
-	init function for enviroment args and all global tools
-*/
-func init() {
-	// init enviroment settings
-	initServiceLevel()
-
-	// init global tools
-	initLog()
-}
 
 type ServiceLevel byte
 
@@ -39,4 +30,8 @@ var serviceLevelMapper = map[string]ServiceLevel{
 func initServiceLevel() {
 	serviceLevel := flag.String("service-level", "debug", "the ServiceLevel enum description arg")
 	EnviromentSettings.ServiceLevel = serviceLevelMapper[*serviceLevel]
+}
+
+func InitEnv() {
+	initServiceLevel()
 }

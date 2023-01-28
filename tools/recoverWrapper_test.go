@@ -56,5 +56,5 @@ func TestPrintPanicFunction(t *testing.T) {
 	}()
 
 	wg.Wait()
-	Log.Infof("happy endding\n")
+	t.Logf("happy endding\n")
 }

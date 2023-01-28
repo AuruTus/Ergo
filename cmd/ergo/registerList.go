@@ -7,7 +7,6 @@ import (
 	services "github.com/AuruTus/Ergo/pkg/services"
 )
 
-// TODO: add a code generator to get code from config files
 var registerList = [](func() error){
-	services.RegisterNamedService[handler.WSClientHandler]("cqhttp-ws-client", sp.NewWSClient, cqhttpHandler.NewWSClientHandler(), "cqhttp for feifei"),
+	services.RegisterNamedService[handler.WSClientHandler]("cqhttp_ws_client", sp.NewWSClient, cqhttpHandler.NewWSClientHandler(), "qq robot"),
 }

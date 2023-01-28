@@ -7,7 +7,7 @@ import (
 	"time"
 
 	services "github.com/AuruTus/Ergo/pkg/services"
-	"github.com/AuruTus/Ergo/tools"
+	"github.com/AuruTus/Ergo/pkg/utils/logger"
 )
 
 func RunServices() {
@@ -15,7 +15,7 @@ func RunServices() {
 	os_signal := make(chan os.Signal, 1)
 	signal.Notify(os_signal, syscall.SIGINT, syscall.SIGTERM)
 
-	tools.Log.Infof("Good day! Ergo is at your service.\n")
+	logger.Infof("Good day! Ergo is at your service.\n")
 
 	// TODO add entrance from service manager
 	done := make(chan struct{}, 1)

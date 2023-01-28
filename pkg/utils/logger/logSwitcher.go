@@ -1,31 +1,16 @@
-package tools
+package logger
 
 import (
 	"os"
 	"reflect"
-	"sync"
-	"unicode"
 
+	"github.com/AuruTus/Ergo/pkg/utils/configLoader"
 	"github.com/sirupsen/logrus"
 )
 
-/* initLog should be called in enviromentSettings.go's init() */
-func initLog() {
-	if Log != nil {
-		return
-	}
-	initLogOnce.Do(func() { Log = logSwitcher() })
-}
-
-/* Log is the global Log instance */
-var (
-	Log         *logrus.Logger
-	initLogOnce sync.Once
-)
-
 func logSwitcher() *logrus.Logger {
-	switch EnviromentSettings.ServiceLevel {
-	case SERVICE_LEVEL_BACKGROUND:
+	switch configLoader.EnviromentSettings.ServiceLevel {
+	case configLoader.SERVICE_LEVEL_BACKGROUND:
 		return &logrus.Logger{
 			// TODO change background level config (the output file!)
 			Out:          os.Stderr,
@@ -36,7 +21,7 @@ func logSwitcher() *logrus.Logger {
 			ReportCaller: false,
 		}
 	// the debug level logger works as the default.
-	case SERVICE_LEVEL_DEBUG:
+	case configLoader.SERVICE_LEVEL_DEBUG:
 		fallthrough
 	default:
 		return &logrus.Logger{
@@ -51,28 +36,6 @@ func logSwitcher() *logrus.Logger {
 }
 
 type LogConfigs map[string]any
-
-func isLogConfigKeyValid(key string) bool {
-	isUpperASCIILetter := func(r rune) bool {
-		return r < unicode.MaxASCII && unicode.IsUpper(r)
-	}
-
-	isValidIdentifierName := func(s string) bool {
-		for _, r := range s {
-			if r > unicode.MaxASCII || !unicode.IsLetter(r) && r != '_' {
-				return false
-			}
-		}
-		return true
-	}
-
-	isExportedField := func(key string) bool {
-		return isUpperASCIILetter([]rune(key[:1])[0]) &&
-			isValidIdentifierName(key)
-	}
-
-	return isExportedField(key)
-}
 
 /* NewConfiguredLog works for server points */
 func NewConfiguredLogger(configs LogConfigs) (logger *logrus.Logger) {
