@@ -25,7 +25,6 @@ func (s *WSClient) Serve() (err error) {
 		tools.Log.Infof("try to connect with the address %s the %d time\n", s.WSConfig.HostAddr.String(), i+1)
 		if err = wsservice.TryConnect(s.ctx, s.WSConfig); err != nil {
 			time.Sleep(1 * time.Second)
-			tools.Log.Warnf("client failed to create websocket connection")
 			continue
 		}
 		// succeed to connect with the ws server
