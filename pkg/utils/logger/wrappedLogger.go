@@ -6,6 +6,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func init() {
+	InitLog()
+}
+
 /* InitLog should be called in envInit.go's init() */
 func InitLog() {
 	if Log != nil {

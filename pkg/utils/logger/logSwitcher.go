@@ -1,16 +1,31 @@
 package logger
 
 import (
+	"flag"
 	"os"
 	"reflect"
 
-	"github.com/AuruTus/Ergo/pkg/utils/configLoader"
 	"github.com/sirupsen/logrus"
 )
 
+type ServiceLevel byte
+
+const (
+	SERVICE_LEVEL_DEBUG ServiceLevel = iota
+	SERVICE_LEVEL_BACKGROUND
+)
+
+var serviceLevelMapper = map[string]ServiceLevel{
+	"debug":      SERVICE_LEVEL_DEBUG,
+	"background": SERVICE_LEVEL_BACKGROUND,
+}
+
 func logSwitcher() *logrus.Logger {
-	switch configLoader.EnviromentSettings.ServiceLevel {
-	case configLoader.SERVICE_LEVEL_BACKGROUND:
+
+	serviceLevelEnv := flag.String("service-level", "debug", "the ServiceLevel enum description arg")
+	serviceLevel := serviceLevelMapper[*serviceLevelEnv]
+	switch serviceLevel {
+	case SERVICE_LEVEL_BACKGROUND:
 		return &logrus.Logger{
 			// TODO change background level config (the output file!)
 			Out:          os.Stderr,
@@ -21,7 +36,7 @@ func logSwitcher() *logrus.Logger {
 			ReportCaller: false,
 		}
 	// the debug level logger works as the default.
-	case configLoader.SERVICE_LEVEL_DEBUG:
+	case SERVICE_LEVEL_DEBUG:
 		fallthrough
 	default:
 		return &logrus.Logger{
