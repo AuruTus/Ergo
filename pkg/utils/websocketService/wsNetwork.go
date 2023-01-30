@@ -6,8 +6,8 @@ import (
 	"net"
 
 	"github.com/AuruTus/Ergo/pkg/handler"
+	"github.com/AuruTus/Ergo/pkg/utils"
 	"github.com/AuruTus/Ergo/pkg/utils/logger"
-	"github.com/AuruTus/Ergo/tools"
 	ws "github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 )
@@ -98,7 +98,7 @@ func ServeWSClientConnection(ctx *WSClientContext, h handler.WSClientHandler) {
 			case <-ctx.Done():
 				return
 			default:
-				if err := tools.WithRecover(func() {
+				if err := utils.WithRecover(func() {
 					// ctx.Logger.Infof("writer gets %d info: %s\n", len(msg), msg)
 					h.HandleWrite(ctx.conn, msg)
 				}); err != nil {

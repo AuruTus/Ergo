@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	chatcmd "github.com/AuruTus/Ergo/pkg/handler/cqhttp/chatCmd"
-	"github.com/AuruTus/Ergo/tools"
+	"github.com/AuruTus/Ergo/pkg/utils"
 	"github.com/k3a/html2text"
 )
 
@@ -48,7 +48,7 @@ func getTodayQuestionTitle(url string) string {
 	if err != nil {
 		return "reader error"
 	}
-	val, err := tools.GetJsonField(b, "data.todayRecord[0].question.questionTitleSlug")
+	val, err := utils.GetJsonField(b, "data.todayRecord[0].question.questionTitleSlug")
 	if err != nil {
 		return err.Error()
 	}
@@ -77,9 +77,9 @@ func getTitledProblem(url, title string, verbose bool) string {
 	}
 	problemURL := fmt.Sprintf("%s/%s/%s", lcZH, "problems", title)
 
-	problemNo, _ := tools.GetJsonField(b, "data.question.questionFrontendId")
-	translatedTitle, _ := tools.GetJsonField(b, "data.question.translatedTitle")
-	level, _ := tools.GetJsonField(b, "data.question.difficulty")
+	problemNo, _ := utils.GetJsonField(b, "data.question.questionFrontendId")
+	translatedTitle, _ := utils.GetJsonField(b, "data.question.translatedTitle")
+	level, _ := utils.GetJsonField(b, "data.question.difficulty")
 
 	if !verbose {
 		return fmt.Sprintf("%s. %s: %s\n(%s)\n",
@@ -88,7 +88,7 @@ func getTitledProblem(url, title string, verbose bool) string {
 		)
 	}
 
-	htmlContent, _ := tools.GetJsonField(b, "data.question.translatedContent")
+	htmlContent, _ := utils.GetJsonField(b, "data.question.translatedContent")
 	content := html2text.HTML2Text(htmlContent.String())
 	return fmt.Sprintf(
 		"%s. %s: %s\n(%s)\n\n%s",

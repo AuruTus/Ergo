@@ -21,7 +21,6 @@ var serviceLevelMapper = map[string]ServiceLevel{
 }
 
 func logSwitcher() *logrus.Logger {
-
 	serviceLevelEnv := flag.String("service-level", "debug", "the ServiceLevel enum description arg")
 	serviceLevel := serviceLevelMapper[*serviceLevelEnv]
 	switch serviceLevel {

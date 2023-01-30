@@ -4,18 +4,18 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/AuruTus/Ergo/tools"
+	"github.com/AuruTus/Ergo/pkg/utils"
 )
 
 func main() {
-	err := tools.WithRecover(func() {
+	err := utils.WithRecover(func() {
 		panic("test package visibility")
 	})
-	p := &tools.WrappedPanic{}
+	p := &utils.WrappedPanic{}
 	ok := errors.As(err, &p)
 	fmt.Printf("%t\n%s", ok, p)
 
-	q := &tools.PathError{}
+	q := &utils.PathError{}
 	ok = errors.As(err, &q)
 	fmt.Printf("%t\n", ok)
 }

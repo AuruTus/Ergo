@@ -6,8 +6,8 @@ import (
 
 	"github.com/AuruTus/Ergo/pkg/handler"
 	sp "github.com/AuruTus/Ergo/pkg/servePoint"
+	"github.com/AuruTus/Ergo/pkg/utils"
 	"github.com/AuruTus/Ergo/pkg/utils/logger"
-	"github.com/AuruTus/Ergo/tools"
 	"github.com/sirupsen/logrus"
 )
 
@@ -93,7 +93,7 @@ func RegisterServicesAll(registerList [](func() error)) {
 func StartServicesAll() {
 	for k, s := range services.kv {
 		go func(key string, s *service) {
-			if err := tools.WithRecover(func() {
+			if err := utils.WithRecover(func() {
 				if err := s.servePoint.Serve(); err != nil {
 					panic(fmt.Errorf("service %s with %T serving: %w", key, s.servePoint, err))
 				}
@@ -106,7 +106,7 @@ func StartServicesAll() {
 
 func CloseServicesAll() {
 	for k, s := range services.kv {
-		if err := tools.WithRecover(func() {
+		if err := utils.WithRecover(func() {
 			s.servePoint.Close()
 		}); err != nil {
 			logger.Infof("unable to close service %v: %v", k, err)

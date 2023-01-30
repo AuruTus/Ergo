@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/AuruTus/Ergo/tools"
+	"github.com/AuruTus/Ergo/pkg/utils"
 	ws "github.com/gorilla/websocket"
 )
 
@@ -26,7 +26,7 @@ func (h *WSClientHandler) sendPrivateInfo(c *ws.Conn, targetUserID int64, msg st
 	action := &ActionSendPrivateMsg{
 		CommonActionFields: CommonActionFields{
 			Action: API_SEND_PRIVATE_MSG,
-			Echo:   tools.KeyGen(API_SEND_PRIVATE_MSG, time.Now().UnixMicro()),
+			Echo:   utils.KeyGen(API_SEND_PRIVATE_MSG, time.Now().UnixMicro()),
 		},
 		Params: ParamsSendPrivateMsg{
 			UserID:     targetUserID,
@@ -44,7 +44,7 @@ func (h *WSClientHandler) sendGroupMsg(c *ws.Conn, targetGroupID int64, msg stri
 	action := &ActionSendGroupMsg{
 		CommonActionFields: CommonActionFields{
 			Action: API_SNED_GROUP_MSG,
-			Echo:   tools.KeyGen(API_SNED_GROUP_MSG, time.Now().UnixMicro()),
+			Echo:   utils.KeyGen(API_SNED_GROUP_MSG, time.Now().UnixMicro()),
 		},
 		Params: ParamsSendGroupMsg{
 			GroupID:    targetGroupID,
