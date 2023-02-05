@@ -15,13 +15,14 @@ const (
 	SERVICE_LEVEL_BACKGROUND
 )
 
+var serviceLevelEnv = flag.String("service-level", "debug", "the ServiceLevel enum description arg")
+
 var serviceLevelMapper = map[string]ServiceLevel{
 	"debug":      SERVICE_LEVEL_DEBUG,
 	"background": SERVICE_LEVEL_BACKGROUND,
 }
 
 func logSwitcher() *logrus.Logger {
-	serviceLevelEnv := flag.String("service-level", "debug", "the ServiceLevel enum description arg")
 	serviceLevel := serviceLevelMapper[*serviceLevelEnv]
 	switch serviceLevel {
 	case SERVICE_LEVEL_BACKGROUND:

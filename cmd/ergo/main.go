@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,7 +14,14 @@ import (
 func RunServices() {
 	/* NOTE: os signal channel's buffer is needed */
 	os_signal := make(chan os.Signal, 1)
-	signal.Notify(os_signal, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(
+		os_signal,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGHUP,
+		syscall.SIGQUIT,
+	)
+	flag.Parse()
 
 	logger.Infof("Good day! Ergo is at your service.\n")
 
@@ -26,7 +34,6 @@ func RunServices() {
 	select {
 	case <-os_signal:
 		services.CloseServicesAll()
-	// case <-services.CloseServicesAll():
 	case <-done:
 	}
 
