@@ -1,6 +1,9 @@
 package main
 
 import (
+	// plugin
+	_ "github.com/AuruTus/Ergo/internal/plugin/cqhttp/cmds"
+
 	"github.com/AuruTus/Ergo/pkg/handler"
 	cqhttpHandler "github.com/AuruTus/Ergo/pkg/handler/cqhttp"
 	engines "github.com/AuruTus/Ergo/pkg/serveEngines"
