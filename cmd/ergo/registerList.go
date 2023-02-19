@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/AuruTus/Ergo/pkg/handler"
 	cqhttpHandler "github.com/AuruTus/Ergo/pkg/handler/cqhttp"
+	engines "github.com/AuruTus/Ergo/pkg/serveEngines"
 	sp "github.com/AuruTus/Ergo/pkg/servePoint"
-	services "github.com/AuruTus/Ergo/pkg/services"
 )
 
 var registerList = [](func() error){
-	services.RegisterNamedService[handler.WSClientHandler]("cqhttp_ws_client", sp.NewWSClient, cqhttpHandler.NewWSClientHandler(), "qq robot"),
+	engines.RegisterNamedEngine[handler.WSClientHandler]("cqhttp_ws_client", sp.NewWSClient, cqhttpHandler.NewWSClientHandler(), "qq robot"),
 }

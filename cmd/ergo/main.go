@@ -7,11 +7,11 @@ import (
 	"syscall"
 	"time"
 
-	services "github.com/AuruTus/Ergo/pkg/services"
+	engines "github.com/AuruTus/Ergo/pkg/serveEngines"
 	"github.com/AuruTus/Ergo/pkg/utils/logger"
 )
 
-func RunServices() {
+func RunEngines() {
 	/* NOTE: os signal channel's buffer is needed */
 	os_signal := make(chan os.Signal, 1)
 	signal.Notify(
@@ -28,12 +28,12 @@ func RunServices() {
 	// TODO add entrance from service manager
 	done := make(chan struct{}, 1)
 
-	services.RegisterServicesAll(registerList)
-	services.StartServicesAll()
+	engines.RegisterEnginesAll(registerList)
+	engines.StartEnginesAll()
 
 	select {
 	case <-os_signal:
-		services.CloseServicesAll()
+		engines.CloseEnginesAll()
 	case <-done:
 	}
 
@@ -41,5 +41,5 @@ func RunServices() {
 }
 
 func main() {
-	RunServices()
+	RunEngines()
 }
