@@ -1,22 +1,24 @@
 
+ROOTPATH:=${realpath .}
 
-# TODO: add init config for project
-# .PHONY: init-config
-# init-config:
-# # if the project is new cloned from remote repo, the tstr_entry.go will be missing
-# ifeq (,$(wildcard ./tstr_entry.go))
-# 	./scripts/init_dojo.sh
-# endif
+ERGO_MAIN:=${ROOTPATH}/cmd/ergo/
+ERGO_EXE:=${ROOTPATH}/bin/ergo/go-ergo
+
+ERGO_SRC:=${shell find ./cmd/ergo -type f -name '*'} \
+${shell find ./pkg -type f -name '*'} \
+${shell find ./internal -type f -name '*'}
 
 
-# build: init-config
-build:
-	go build -o ./bin/ergo/go-ergo ./cmd/ergo
+.PHONY: build
+build: ${ERGO_SRC}
+	go build -o ${ERGO_EXE} ${ERGO_MAIN}
 
+${ERGO_EXE}: ${ERGO_SRC}
+	go build -o $@ ${ERGO_MAIN}
 
 .PHONY: run
-run: build
-	./bin/ergo/go-ergo
+run: ${ERGO_EXE}
+	@$<
 
 
 .PHONY: test
